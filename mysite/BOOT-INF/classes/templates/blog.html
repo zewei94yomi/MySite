@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="_fragments :: head(~{::title})">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>详情</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <link rel="stylesheet" href="../static/css/me.css">
+    <link rel="stylesheet" href="../static/css/typo.css">
+    <link rel="stylesheet" href="../static/css/animate.css">
+    <link rel="stylesheet" href="../static/lib/prism/prism.css">
+    <link rel="stylesheet" href="../static/lib/tocbot/tocbot.css">
+    <link rel="stylesheet" href="../static/css/slideVal.css">
+    <link rel="stylesheet" href="../static/font/iconfont.css">
+</head>
+<body>
+
+<!--  导航  -->
+<nav th:replace="_fragments :: menu(0)"class="ui inverted attached segment m-padded-tb-mini m-shadow-small">
+    <div class="ui container">
+        <div class="ui inverted secondary stackable menu">
+            <h2 class="ui teal header item">Blog</h2>
+            <a href="#" class="m-item item m-mobile-hide"><i class="home icon"></i>首页</a>
+            <a href="#" class="m-item item m-mobile-hide"><i class="idea icon"></i>分类</a>
+            <a href="#" class="m-item item m-mobile-hide"><i class="tags icon"></i>标签</a>
+            <a href="#" class="m-item item m-mobile-hide"><i class="clone icon"></i>归档</a>
+            <a href="#" class="m-item item m-mobile-hide"><i class="info icon"></i>关于我</a>
+            <div class="right m-item item m-mobile-hide">
+                <div class="ui icon inverted transparent input m-margin-tb-tiny">
+                    <input type="text" placeholder="Search....">
+                    <!--放大镜-->
+                    <i class="search link icon"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <a href="#" class="ui menu toggle black icon button m-right-top m-mobile-show">
+        <i class="sidebar icon"></i>
+    </a>
+</nav>
+
+<!--  中间主体  -->
+<div id="waypoint" class="m-container m-padded-tb-large animated fadeIn">
+    <div class="ui container" id="context">
+
+        <!-- 主体内容 -->
+        <div>
+            <!--博客数据-->
+            <div class="ui top attached segment">
+                <div class="ui horizontal link list ">
+                    <!--作者-->
+                    <div class="item">
+                        <img src="https://unsplash.it/100/100?image=1005" th:src="${blog.user.avatar}" alt="" class="ui avatar image">
+                        <div class="content"><a href="#" class="header" th:text="${blog.user.nickname}">李仁密</a></div>
+                    </div>
+                    <!-- 四大数据：创建时间、访问、点赞、评论 -->
+                    <!-- 创建时间 -->
+                    <div class="item">
+                        <i class="calendar alternate outline icon"></i>
+                        <span  th:text="${#dates.format(blog.create_time, 'yyyy-MM-dd')}" class="vertical-aligned-middle m-text-size-big">2017-10-01</span>
+                    </div>
+                    <!-- 访问量 -->
+                    <div class="item">
+                        <i class="eye icon"></i>
+                        <span th:text="${blog.views}" class="vertical-aligned-middle m-text-size-big">2342</span>
+                    </div>
+                    <!-- 点赞数 -->
+                    <div class="item">
+                        <i class="thumbs up outline icon"></i>
+                        <span th:text="${blog.likes}" class="vertical-aligned-middle m-text-size-big">23</span>
+                    </div>
+                    <!-- 评论数 -->
+                    <div class="item" th:if="${blog.commentable}">
+                        <i class="comment alternate icon"></i>
+                        <span th:text="${blog.commentNum}" class="vertical-aligned-middle m-text-size-big">5</span>
+                    </div>
+                </div>
+            </div>
+
+            <!--图片-->
+            <div class="ui attached segment">
+                <img src="https://unsplash.it/800/450?image=1005" th:src="${blog.first_picture}" alt="" class="ui centered rounded image">
+            </div>
+
+            <!--正文-->
+            <div class="ui padded attached segment">
+                <!--分类/标签/Flag-->
+                <div class="ui segment grid">
+                    <div class="m-padded-lr-responsive six wide column">
+                        <div class="m-padded-tb-tiny">
+                            <div class="ui teal labels">
+                                <span class="vertical-aligned-middle m-padded-tb-medium m-text-thick">
+                                    分类专栏：
+                                </span>
+                                <a href="#" target="_blank" th:href="@{/types/{id}(id=${blog.type.type_id})}" class="ui teal label " th:if="${blog.type} != null">
+                                    <span th:text="${blog.type.type_name}" >方法论</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="m-padded-lr-responsive ten wide column">
+                        <div class="m-padded-tb-tiny">
+                            <div class="ui blue labels">
+                                <span class="vertical-aligned-middle m-padded-tb-medium m-text-thick">
+                                    文章标签：
+                                </span>
+                                <a href="#" target="_blank" th:href="@{/tags/{id}(id=${tag.tag_id})}"  class="ui tag label" th:each="tag : ${blog.tags}">
+                                    <span th:text="${tag.tag_name}">方法论</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <a class="ui ribbon red label" th:text="${blog.flag}" th:if="${blog.flag} == '原创'">原创</a>
+                <a class="ui ribbon blue label" th:text="${blog.flag}" th:if="${blog.flag} == '翻译'">翻译</a>
+                <a class="ui ribbon green label" th:text="${blog.flag}" th:if="${blog.flag} == '转载'">转载</a>
+                <!-- 编辑按钮 -->
+                <div class="ui right aligned basic segment">
+                    <a href="#" th:href="@{/admin/blog/update/{id}(id=${blog.blog_id})}" class="ui animated button" tabindex="0" th:if="${session.loginUser} != null">
+                        <div class="visible content">编辑</div>
+                        <div class="hidden content">
+                            <i class="pencil alternate icon"></i>
+                        </div>
+                    </a>
+                </div>
+                <!-- 标题 -->
+                <h2 class="ui center aligned header" th:text="${blog.title}" >关于刻意练习的清单</h2>
+                <br>
+
+                <!--博客内容 -->
+                <div class="ui" id="content-container">
+                    <!-- 目录 -->
+                    <div class="right ui rail m-mobile-hide" style="">
+                        <div class="ui sticky" style="width: 272px !important; height: 262.53125px !important; left: 1365px; padding-top: 100px !important;">
+                            <h3 class="ui header">目录</h3>
+                            <ol class="toc" style="font-size: medium">
+                            </ol>
+                            <img>
+                        </div>
+                    </div>
+                    <!-- 正文内容 -->
+                    <div class="typo typo-selection js-toc-content m-padded-lr-responsive m-padded-tb-large" th:utext="${blog.content}">
+
+                        <h2 id="section1">一、关于 <i class="serif">Typo.css</i></h2>
+
+                        <pre><code class="language-css">p { color: red }</code></pre>
+
+                        <pre><code class="language-css">p { color: red }</code></pre>
+
+                        <p><i class="serif">Typo.css</i> 的目的是，在一致化浏览器排版效果的同时，构建最适合中文阅读的网页排版。</p>
+                        <h4>现状和如何去做：</h4>
+
+                        <h4>You may want to create a perfect <code>&lt;hr /&gt;</code> line, despite the fact that there will never have one
+                        </h4>
+                        <hr/>
+                        <p><abbr title="法国作家罗切福考尔德">La Racheforcauld</abbr> said:
+                            <mark>"Few things are impossible in themselves; and it is often for want of will, rather than of means, that man fails
+                                to succeed".
+                            </mark>
+                            You just need to follow the browser's behavior, and set a right <code>margin</code> to it。it will works nice as the
+                            demo you're watching now. The following code is the best way to render typo in Chinese:
+                        </p>
+                        <pre ><code class="language-css">
+/* 标题应该更贴紧内容，并与其他块区分，margin 值要相应做优化 */
+h1,h2,h3,h4,h5,h6 {
+    line-height:1;font-family:Arial,sans-serif;margin:1.4em 0 0.8em;
+}
+h1{font-size:1.8em;}
+h2{font-size:1.6em;}
+h3{font-size:1.4em;}
+h4{font-size:1.2em;}
+h5,h6{font-size:1em;}
+
+/* 现代排版：保证块/段落之间的空白隔行 */
+.typo p, .typo pre, .typo ul, .typo ol, .typo dl, .typo form, .typo hr {
+    margin:1em 0 0.6em;
+}
+</code></pre>
+
+                        <h3 id="section3">三、附录</h3>
+
+                        <h5 id="appendix1">1、<i class="serif">Typo.css</i> 排版偏重点</h5>
+                        <table class="ui table" summary="Typo.css 排版偏重点">
+                            <thead>
+                            <tr>
+                                <th>类型</th>
+                                <th>语义</th>
+                                <th>标签</th>
+                                <th>注意点</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <th rowspan="15">基础标签</th>
+                                <td>标题</td>
+                                <td><code>h1</code> ～ <code>h6</code></td>
+                                <td>全局不强制大小，<code>.typo</code> 中标题与其对应的内容应紧贴，并且有相应的大小设置</td>
+                            </tr>
+                            <tr>
+                                <td>上、下标</td>
+                                <td><code>sup</code>/<code>sub</code></td>
+                                <td>保持与 MicroSoft Office Word 等程序的日常排版一致</td>
+                            </tr>
+                            <tr>
+                                <td>引用</td>
+                                <td><code>blockquote</code></td>
+                                <td>显示/嵌套样式</td>
+                            </tr>
+                            <tr>
+                                <td>缩写</td>
+                                <td><code>abbr</code></td>
+                                <td>是否都有下划线，鼠标 <code>hover</code> 是否为帮助手势</td>
+                            </tr>
+                            <tr>
+                                <td>分割线</td>
+                                <td><code>hr</code></td>
+                                <td>显示的 <code>padding</code> 和 <code>margin</code>正确</td>
+                            </tr>
+                            <tr>
+                                <td>列表</td>
+                                <td><code>ul</code>/<code>ol</code>/<code>dl</code></td>
+                                <td>在全局没有 <code>list-style</code>，在 .<code>typo</code> 中对齐正确</td>
+                            </tr>
+                            <tr>
+                                <td>定义列表</td>
+                                <td><code>dl</code></td>
+                                <td>全局 <code>padding</code> 和 <code>margin</code>为0， .<code>typo</code> 中对齐正确</td>
+                            </tr>
+                            <tr>
+                                <td>选项</td>
+                                <td><code>input[type=radio[, checkbox]]</code></td>
+                                <td>与其他 <code>form</code> 元素排版时是否居中</td>
+                            </tr>
+                            <tr>
+                                <td>斜体</td>
+                                <td><code>i</code></td>
+                                <td>只设置一种斜体，让 <code>em</code> 和 <code>cite</code> 显示为正体</td>
+                            </tr>
+                            <tr>
+                                <td>强调</td>
+                                <td><code>em</code></td>
+                                <td>在全局显示正体，在 <code>.typo</code> 中显示与 <code>b</code> 和 <code>strong</code> 的样式一致，为粗体</td>
+                            </tr>
+                            <tr>
+                                <td>加强</td>
+                                <td><code>strong/b</code></td>
+                                <td>显示为粗体</td>
+                            </tr>
+                            <tr>
+                                <td>标记</td>
+                                <td><code>mark</code></td>
+                                <td>类似荧光笔</td>
+                            </tr>
+                            <tr>
+                                <td>印刷</td>
+                                <td><code>small</code></td>
+                                <td>保持为正确字体的 80% 大小，颜色设置为浅灰色</td>
+                            </tr>
+                            <tr>
+                                <td>表格</td>
+                                <td><code>table</code></td>
+                                <td>全局不显示线条，在 <code>table</code> 中显示表格外框，并且表头有浅灰背景</td>
+                            </tr>
+                            <tr>
+                                <td>代码</td>
+                                <td><code>pre</code>/<code>code</code></td>
+                                <td>字体使用 <code>courier</code> 系字体，保持与 <code>serif</code> 有比较一致的显示效果</td>
+                            </tr>
+                            <tr>
+                                <th rowspan="5">特殊符号</th>
+                                <td>着重号</td>
+                                <td><em class="typo-em">在文字下加点</em></td>
+                                <td>在支持 <code>:after</code> 和 <code>:before</code> 的浏览器可以做渐进增强实现</td>
+                            </tr>
+                            <tr>
+                                <td>专名号</td>
+                                <td><u>林建锋</u></td>
+                                <td>专名号，有下划线，使用 <code>u</code> 或都 <code>.typo-u</code> 类</td>
+                            </tr>
+                            <tr>
+                                <td>破折号</td>
+                                <td>——</td>
+                                <td>保持一划，而非两划</td>
+                            </tr>
+                            <tr>
+                                <td>人民币</td>
+                                <td>&yen;</td>
+                                <td>使用两平等线的符号，或者 HTML 实体符号 <code>&amp;yen;</code></td>
+                            </tr>
+                            <tr>
+                                <td>删除符</td>
+                                <td>
+                                    <del>已删除（deleted）</del>
+                                </td>
+                                <td>一致化各浏览器显示，中英混排正确</td>
+                            </tr>
+                            <tr>
+                                <th rowspan="3">加强类</th>
+                                <td>专名号</td>
+                                <td><code>.typo-u</code></td>
+                                <td>由于 <code>u</code> 被 HTML4 放弃，在向后兼容上推荐使用 <code>.typo-u</code></td>
+                            </tr>
+                            <tr>
+                                <td>着重符</td>
+                                <td><code>.typo-em</code></td>
+                                <td>利用 <code>:after</code> 和 <code>:before</code> 实现着重符</td>
+                            </tr>
+                            <tr>
+                                <td>清除浮动</td>
+                                <td><code>.clearfix</code></td>
+                                <td>与一般 CSS Reset 保持一对致 API</td>
+                            </tr>
+                            <tr>
+                                <th rowspan="5">注意点</th>
+                                <td colspan="3">（1）中英文混排行高/行距</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3">（2）上下标在 IE 中显示效果</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3">（3）块/段落分割空白是否符合设计原则</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3">（4）input 多余空间问题</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3">（5）默认字体色彩，目前采用 <code>#333</code> 在各种浏览显示比较好</td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                        <h5 id="appendix2">2、开源许可</h5>
+
+                    </div>
+                </div>
+
+                <!-- 编辑 -->
+                <div class="ui right aligned basic segment">
+                    <a href="#" th:href="@{/admin/blog/update/{id}(id=${blog.blog_id})}" class="ui animated button" tabindex="0" th:if="${session.loginUser} != null">
+                        <div class="visible content">编辑</div>
+                        <div class="hidden content">
+                            <i class="pencil alternate icon"></i>
+                        </div>
+                    </a>
+                </div>
+
+                <!--赞赏、点赞、评论按钮-->
+                <div class="ui segment center aligned basic item">
+                    <!--点赞-->
+                    <div class="ui labeled button" tabindex="0" onclick="thumbsUp()">
+                        <div class="ui icon button" id="like-btn">
+                            <i class="thumbs up outline icon" id="like-icon"></i>
+                        </div>
+                        <a class="ui basic label" id="like-a" th:text="${blog.likes}">
+                            2,048
+                        </a>
+                    </div>
+                    <!-- 评论 -->
+                    <div class="ui labeled button" tabindex="0" th:if="${blog.commentable}">
+                        <a href="#comment-container" class="ui icon primary button">
+                            <i class="comment alternate icon"></i>
+                        </a>
+                        <a href="#comment-container" class="ui basic blue label comment-num" th:text="${blog.commentNum}">
+                            1,048
+                        </a>
+                    </div>
+                    <!-- 赞赏 -->
+                    <div class="wechatPay ui green icon button" th:if="${blog.appreciation}">
+                        <i class="iconfont icon-weixin"></i>
+                    </div>
+                    <div class="alipayPay ui blue icon button" th:if="${blog.appreciation}">
+                        <i class="iconfont icon-zhifubao2"></i>
+                    </div>
+                </div>
+                <!-- 微信：隐藏的二维码 -->
+                <div class="ui wechatPayQR flowing popup transition hidden">
+                    <!--二维码图片-->
+                    <div class="ui basic label">
+                        <div class="ui images" style="font-size: inherit !important;">
+                            <div class="image">
+                                <img src="../static/images/wechatpay.jpg" th:src="@{/images/wechatpay.jpg}" alt="" class="ui rounded border image" style="width: 240px">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 支付宝：隐藏的二维码 -->
+                <div class="ui alipayPayQR flowing popup transition hidden">
+                    <!--二维码图片-->
+                    <div class="ui basic label">
+                        <div class="ui images" style="font-size: inherit !important;">
+                            <div class="image">
+                                <img src="../static/images/alipay.jpg" th:src="@{/images/alipay.jpg}" alt="" class="ui rounded border image" style="width: 240px">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 博客基本信息：作者、发布时间、版权声明等 -->
+            <div class="ui attached positive message" th:if="${blog.shareStatement}">
+                <!--博客信息-->
+                <div class="ui middle aligned grid">
+                    <!--左边信息-->
+                    <div class="eleven wide column">
+                        <ui class="list">
+                            <li>作者：<span th:text="${blog.user.nickname}">周泽炜</span><a href="#" th:href="@{/about}" target="_blank">（联系作者）</a></li>
+                            <li>发表时间：<span th:text="${#dates.format(blog.create_time, 'yyyy-MM-dd &nbsp HH:mm')}">2017-10-01</span></li>
+                            <li>版权声明：自由转载-非商用-非衍生-保持署名（创意共享3.0许可证）</li>
+                            <li>公众号转载：请在文末添加本文地址</li>
+                        </ui>
+                    </div>
+<!--                    &lt;!&ndash;右边二维码部分&ndash;&gt;-->
+<!--                    <div class="five wide column">-->
+<!--                        <img src="../static/images/wechat.jpg" th:src="@{/images/wechat.jpg}" alt="" class="ui right floated rounded bordered image" style="width: 110px">-->
+<!--                    </div>-->
+                </div>
+            </div>
+
+            <!-- 留言 -->
+            <div class="ui bottom attached segment" th:if="${blog.commentable}" >
+                <!-- 留言区域列表 -->
+                <div id="comment-container" class="ui blue segment">
+                    <div th:fragment="commentList">
+                        <div class="ui threaded comments" style="max-width: 100%">
+                            <div class="ui middle aligned two column grid">
+                                <div class="column">
+                                    <h3 class="ui dividing header">评论</h3>
+                                </div>
+                                <div class="right aligned column">
+                                    共 <h2 class="ui orange header m-inline-block m-text-thin comment-num"> 0 </h2> 条
+                                    &nbsp;
+                                    <div class="ui primary button m-padded-medium" onclick="setComment()" id="comment-switch">收起</div>
+                                </div>
+                            </div>
+                            <!-- 父评论 -->
+                            <div id="comment-content-container">
+                                <div class="comment" th:each="comment : ${comments}">
+                                    <a class="avatar popupInfo" data-title="Bob" data-content="hello@gmail.com" th:data-title="${comment.nickname}" th:data-content="${comment.email}">
+                                        <img src="https://unsplash.it/100/100?image=1005" th:src="@{${comment.avatar}}">
+                                    </a>
+                                    <div class="content">
+                                        <a class="author">
+                                    <span th:text="${comment.nickname}" class="popupInfo" data-title="Matt" data-content="hello@gmail.com" th:data-title="${comment.nickname}" th:data-content="${comment.email}">
+                                        Matt
+                                    </span>
+                                            <div class="ui mini basic left pointing teal label m-padded-mini" th:if="${comment.fromAdmin} == true">博主</div>
+                                        </a>
+                                        <div class="metadata">
+                                            <span class="date" th:text="${#dates.format(comment.create_time,'yyyy-MM-dd HH:mm')}">Today at 5:42PM</span>
+                                            <div class="ui button m-padded-mini delete" th:attr="data-commentid=${comment.comment_id}" th:if="${session.loginUser} != null" onclick="deleteComment(this)">删除</div>
+                                        </div>
+                                        <div class="text" th:text="${comment.content}">
+                                            How artistic!
+                                        </div>
+                                        <div class="actions">
+                                            <a class="reply" data-commentid="1" data-commentnickname="Matt" th:attr="data-commentid=${comment.comment_id}, data-commentnickname=${comment.nickname}" onclick="reply(this)">回复</a>
+                                        </div>
+                                    </div>
+                                    <!-- 子评论 -->
+                                    <div class="comments" th:if="${comment.child} != null and ${#arrays.length(comment.child)} > 0">
+                                        <div class="comment" th:each="childComment : ${comment.child}">
+                                            <a class="avatar popupInfo" data-title="Matt" data-content="hello@gmail.com" th:data-title="${childComment.nickname}" th:data-content="${childComment.email}">
+                                                <img src="https://unsplash.it/100/100?image=1005" th:src="@{${childComment.avatar}}">
+                                            </a>
+                                            <div class="content">
+                                                <a class="author">
+                                            <span th:text="${childComment.nickname}" class="popupInfo"  data-title="Matt" data-content="hello@gmail.com" th:data-title="${childComment.nickname}" th:data-content="${childComment.email}">
+                                                Matt
+                                            </span>
+                                                    <div class="ui mini basic left pointing teal label m-padded-mini" th:if="${childComment.fromAdmin} == true">博主</div>
+                                                    <span th:text="| @ ${childComment.parent_nickname}|" class="m-teal popupInfo" data-title="小红" data-content="hello@gmail.com" th:data-title="${childComment.parent_nickname}" th:data-content="${childComment.parent_email}">@ 小红</span>
+                                                </a>
+                                                <div class="metadata">
+                                                    <span class="date" th:text="${#dates.format(childComment.create_time,'yyyy-MM-dd HH:mm')}">Today at 5:42PM</span>
+                                                    <div class="ui button m-padded-mini delete" th:attr="data-commentid=${childComment.comment_id}" th:if="${session.loginUser} != null" onclick="deleteComment(this)">删除</div>
+                                                </div>
+                                                <div class="text" th:text="${childComment.content}">
+                                                    How artistic!
+                                                </div>
+                                                <div class="actions">
+                                                    <a class="reply" data-commentid="1" data-commentnickname="Matt" th:attr="data-commentid=${childComment.comment_id}, data-commentnickname=${childComment.nickname}" onclick="reply(this)">回复</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--/*-->
+                                <div class="comment">
+                                    <a class="avatar">
+                                        <img src="https://unsplash.it/100/100?image=1005">
+                                    </a>
+                                    <div class="content">
+                                        <a class="author">Elliot Fu</a>
+                                        <div class="metadata">
+                                            <span class="date">Yesterday at 12:30AM</span>
+                                        </div>
+                                        <div class="text">
+                                            <p>This has been very useful for my research. Thanks as well!</p>
+                                        </div>
+                                        <div class="actions">
+                                            <a class="reply">回复</a>
+                                        </div>
+                                    </div>
+                                    <div class="comments">
+                                        <div class="comment">
+                                            <a class="avatar">
+                                                <img src="https://unsplash.it/100/100?image=1005">
+                                            </a>
+                                            <div class="content">
+                                                <a class="author">Jenny Hess</a>
+                                                <div class="metadata">
+                                                    <span class="date">Just now</span>
+                                                </div>
+                                                <div class="text">
+                                                    Elliot you are always so right :)
+                                                </div>
+                                                <div class="actions">
+                                                    <a class="reply">回复</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="comment">
+                                    <a class="avatar">
+                                        <img src="https://unsplash.it/100/100?image=1005">
+                                    </a>
+                                    <div class="content">
+                                        <a class="author">Joe Henderson</a>
+                                        <div class="metadata">
+                                            <span class="date">5 days ago</span>
+                                        </div>
+                                        <div class="text">
+                                            Dude, this is awesome. Thanks so much
+                                        </div>
+                                        <div class="actions">
+                                            <a class="reply">回复</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--*/-->
+                            </div>
+
+                        </div>
+                        <div class="ui active inverted dimmer" id="comment-loader">
+                            <div class="ui medium text loader">加载中</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 留言提交：这里采用div的form，而不用html自带的form，因为我们要用jquery的请求去提交 -->
+                <div class="ui comment form">
+                    <input type="hidden" name="blog_id" th:value="${blog.blog_id}">
+                    <input type="hidden" name="parent_id" value="-1">
+                    <div class="field">
+                        <textarea name="content" placeholder="请输入评论信息..." class="m-text-medium"></textarea>
+                    </div>
+                    <div class="fields">
+                        <div class="field m-mobile-wide m-margin-bottom-small">
+                            <div class="ui left icon input">
+                                <i class="user icon"></i>
+                                <input type="text" name="nickname" placeholder="昵称" th:value="${session.loginUser} != null ? ${session.loginUser.nickname}" th:readonly="${session.loginUser} != null ? 'readonly'">
+                            </div>
+                        </div>
+                        <div class="field m-mobile-wide m-margin-bottom-small">
+                            <div class="ui left icon input">
+                                <i class="mail icon"></i>
+                                <input type="text" name="email" placeholder="邮箱" th:value="${session.loginUser} != null ? ${session.loginUser.email}" th:readonly="${session.loginUser} != null ? 'readonly'">
+                            </div>
+                        </div>
+
+                        <!-- 评论按钮 -->
+                        <div class="field m-margin-bottom-small m-mobile-wide">
+                            <button id="commentclear-btn" type="button" class="ui gray button m-mobile-wide" onclick="clearContent()"><i class="eraser icon"></i>清空</button>
+                            <button id="commentpost-btn" type="button" class="ui teal button m-mobile-wide" onclick="postComment()"><i class="edit icon"></i>发布</button>
+                        </div>
+                        <input type="text" style="display:none" name="slideValidation" id="slideValidation"/>
+                        <!--滑动验证框-->
+                        <div id="slide_box" class="ui fluid m-margin-bottom-small m-mobile-wide" >
+                            <div id="slide_xbox">
+                                <div id="btn">
+                                    <i class="iconfont icon-double-right"></i>
+                                    <img src="" alt="">
+                                </div>
+                            </div>
+                            滑动验证
+                        </div>
+                    </div>
+                    <!--评论时的提示信息-->
+                    <div class="ui error message"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- 弹出的小插件 -->
+<div id="toolbar" class="m-padded m-fixed m-right-bottom" style="display: none">
+    <div class="ui vertical icon buttons ">
+<!--        <button type="button" class="ui toc teal button" >目录</button>-->
+        <a href="#comment-container" class="ui primary huge button" ><i class="comment alternate icon"></i></a>
+<!--        <button class="ui wechat icon button"><i class="weixin icon"></i></button>-->
+        <div id="toTop-button" class="ui teal huge button" onclick="toTop()"><i class="angle double up icon"></i></div>
+    </div>
+</div>
+
+<!-- tocbot插件存在一点问题，一次只能对一个class的DOM元素生成目录表 -->
+<!-- 小插件：弹出目录 -->
+<!--<div class="ui toc-container flowing popup transition hidden" style="width: 250px!important;">-->
+<!--    <div>目录</div>-->
+<!--    <ol class="toc">-->
+<!--    </ol>-->
+<!--</div>-->
+
+<!-- 博客阅读微信二维码（弃用 -->
+<!--<div id="qrcode" class="ui wechatQR flowing popup transition hidden "style="width: 130px !important;">-->
+<!--    &lt;!&ndash; 这里的文章二维码是以动态形式产生，由一个二维码生成插件产生 &ndash;&gt;-->
+<!--</div>-->
+
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<!-- 确认删除 -->
+<div class="ui container">
+    <div class="ui tiny basic modal">
+        <i class="close icon"></i>
+        <div class="header">确定删除该评论吗？</div>
+        <div class="content">
+            该评论删除后其附属的子评论也将一并删除，是否确定删除？
+        </div>
+        <div class="actions">
+            <div class="ui red deny button">
+                取消
+            </div>
+            <div class="ui positive right labeled icon button">
+                确认
+                <i class="checkmark icon"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--  底部footer  -->
+<footer th:replace="_fragments :: footer" class="ui inverted vertical segment m-padded-tb-massive">
+</footer>
+
+<th:block th:replace="_fragments :: script">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.2/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+    <script src="../static/lib/prism/prism.js"></script>
+    <script src="../static/lib/tocbot/tocbot.min.js"></script>
+    <script src="../static/lib/qrcode/qrcode.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/jquery.scrollto@2.1.2/jquery.scrollTo.min.js"></script>
+    <script src="../static/lib/waypoints/jquery.waypoints.min.js"></script>
+</th:block>
+
+<script th:inline="javascript">
+
+    // 弹出工具栏中的二维码（弃用）
+    // 服务器地址，由application配置文件中获得
+    // var serurl = /*[[#{server.url}]]*/"127.0.0.1:8080";
+    // var url = /*[[@{/blog/{id}(id=${blog.blog_id})}]]*/"";
+    // var qrcode = new QRCode("qrcode", {
+    //     text: serurl+url,
+    //     width: 110,
+    //     height: 110,
+    //     colorDark : "#000000",
+    //     colorLight : "#ffffff",
+    //     correctLevel : QRCode.CorrectLevel.H
+    // });
+
+    // 打开博客详情页自动加载：访问该条博客下的所有评论
+    $(function () {
+        var url = /*[[@{/comments/{id}(id=${blog.blog_id})}]]*/"comments/6";
+        loadComment(url);
+        updateCommentNum();
+    });
+
+    // 设定"点赞"按钮的样式，如果之前点过赞...;如果没有点过赞...
+    $(function() {
+        var blog_id = [[${blog.blog_id}]];
+        setLikeBtnStyle(blog_id);
+    });
+
+    // 点赞功能
+    function thumbsUp() {
+        var blog_id = [[${blog.blog_id}]];
+        var likes = parseInt($("#like-a").text());
+        if (localStorage.getItem(blog_id) === "like") {
+            var url = /*[[@{/blog/cancelLike/{id}(id=${blog.blog_id})}]]*/"blog/cancelLike/1";
+            cancelLike(likes, url, blog_id);
+        } else {
+            var url = /*[[@{/blog/like/{id}(id=${blog.blog_id})}]]*/"blog/like/1";
+            like(likes, url, blog_id);
+        }
+    }
+
+    // 提交评论
+    function postComment() {
+        var url = /*[[@{/comment}]]*/"";
+        validateAndPostComment(url);
+    }
+
+    // 查询并更新博客下的评论总数
+    function updateCommentNum() {
+        var url = /*[[@{/comment/num/{id}(id=${blog.blog_id})}]]*/"comment/num/1";
+        getCommentNum(url);
+    }
+
+    // 删除评论
+    function deleteComment(obj) {
+        var commentId = $(obj).data('commentid');
+        var url = /*[[@{/comment/delete}]]*/"";
+        url += "/" + commentId;
+        modalDeleteComment(url);
+    }
+
+</script>
+
+</body>
+</html>

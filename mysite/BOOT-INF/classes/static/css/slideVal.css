@@ -1,0 +1,39 @@
+#slide_box {
+    width: 12em;
+    height: 35px;
+    text-align: center;
+    line-height: 35px;
+    font-size: 14px;
+    color: #717171;
+    background-color: #e8e8e8;
+    border: none;
+    margin-bottom: 20px;
+}
+
+#slide_xbox {
+    width: 40px;
+    height: 35px;
+    text-align: center;
+    line-height: 35px;
+    font-size: 16px;
+    color: #fff;
+    position: absolute;
+    background: #35b34a;
+}
+
+#btn {
+    cursor: pointer;
+    width: 40px;
+    height: 35px;
+    background-color: #fff;
+    float: right;
+    -webkit-box-shadow: 0px 0px 15px 0px #ddd;
+    -moz-box-shadow: 0px 0px 15px 0px #ddd;
+    box-shadow: 0px 0px 15px 0px #ddd;
+    color: #8a8c97;
+
+}
+
+#btn > .iconfont {
+    font-size: 20px;
+}

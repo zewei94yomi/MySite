@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zzw.mysite.mapper.TypeMapper">
+
+    <insert id="saveType" parameterType="Type" >
+        insert into blog.blog_type
+        (type_name)
+        values
+        (#{type_name});
+    </insert>
+
+    <delete id="removeTypeById" parameterType="int">
+        delete from blog.blog_type where type_id = #{type_id}
+    </delete>
+
+    <delete id="removeTypeByName" parameterType="String">
+        delete from blog.blog_type where type_name = #{type_name}
+    </delete>
+
+    <select id="queryTypeById" parameterType="int" resultType="Type">
+        select * from blog.blog_type where type_id = #{type_id}
+    </select>
+
+    <select id="queryTypeByName" resultType="Type" parameterType="String">
+        select * from blog.blog_type where type_name = #{type_name}
+    </select>
+
+    <update id="updateType" parameterType="Type">
+        update blog.blog_type set type_name=#{type_name} where type_id=#{type_id}
+    </update>
+
+    <select id="queryTypeList" resultType="Type">
+        select * from blog.blog_type
+    </select>
+
+    <select id="queryTypeViewListByTopLimit" parameterType="int" resultType="TypeView">
+        select t.type_id, t.type_name, count(b.blog_id) as blog_num
+        from blog.blog_type t
+        left join blog.blog b on t.type_id = b.type_id
+        where b.published = true
+        group by t.type_id
+        order by blog_num desc
+        limit #{topSize}
+    </select>
+
+    <select id="queryTypeViewList" resultType="TypeView">
+        select t.type_id, t.type_name, count(b.blog_id) as blog_num
+        from blog.blog_type t
+        left join blog.blog b on t.type_id = b.type_id
+        group by t.type_id
+        order by blog_num desc
+    </select>
+
+</mapper>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+                xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+
+<!-- 后台导航 -->
+<nav th:fragment="menu(n)" class="ui inverted attached segment m-padded-tb-medium m-shadow-small" >
+    <div class="ui container">
+        <div class="ui inverted secondary stackable menu">
+            <h2 class="ui teal header item">Blog</h2>
+            <a href="#" th:href="@{/admin/index}" class="m-item item m-mobile-hide" th:classappend="${n==1} ? 'active'"><i class="home icon"></i>首页</a>
+            <a href="#" th:href="@{/admin/blog}" class="m-item item m-mobile-hide" th:classappend="${n==2} ? 'active'"><i class="book icon"></i>博客</a>
+            <a href="#" th:href="@{/admin/type}" class="m-item item m-mobile-hide" th:classappend="${n==3} ? 'active'"><i class="idea icon"></i>分类</a>
+            <a href="#" th:href="@{/admin/tag}" class="m-item item m-mobile-hide" th:classappend="${n==4} ? 'active'"><i class="tags icon"></i>标签</a>
+            <div class="item m-item m-mobile-hide" th:classappend="${n==5} ? 'active'">
+                <div class="ui dropdown ">
+                    <div class="text">
+                        <i class="wrench icon"></i>
+                        设置
+                        <i class="dropdown icon"></i>
+                    </div>
+                    <div class="menu">
+                        <a href="#" th:href="@{/admin/settings}" class="item">个人设置</a>
+                        <a href="#" th:href="@{/admin/pwd}" class="item">修改密码</a>
+                    </div>
+                </div>
+            </div>
+
+            <a href="#" th:href="@{/}" class="m-item item m-mobile-hide" th:classappend="${n==6} ? 'active'"><i class="user outline icon"></i>前台</a>
+
+            <div class="right m-item m-mobile-hide menu">
+                <div class="ui dropdown item">
+                    <div class="text">
+                        <img class="ui avatar image" src="https://unsplash.it/100/100?image=1005" th:src="${session.loginUser.avatar}">
+                        <span th:text="${session.loginUser.nickname}"></span>
+                    </div>
+                    <i class="dropdown icon"></i>
+                    <div class="menu">
+                        <a href="#" th:href="@{/admin/settings}" class="item" style="text-align: center">个人设置</a>
+                        <a href="#" th:href="@{/admin/pwd}" class="item" style="text-align: center">修改密码</a>
+                        <a href="#" th:href="@{/admin/logout_back}" class="item" style="text-align: center">退出登录</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <a href="#" class="ui menu toggle black icon button m-right-top m-mobile-show">
+        <i class="sidebar icon"></i>
+    </a>
+</nav>
+
+</body>
+</html>

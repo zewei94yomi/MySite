@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zzw.mysite.mapper.CommentMapper">
+
+    <insert id="saveComment" parameterType="Comment">
+        insert into blog.comment
+        (nickname, email, content, avatar, create_time, fromAdmin, blog_id, parent_id, root_parent_id)
+        value
+        (#{nickname}, #{email}, #{content}, #{avatar}, #{create_time}, #{fromAdmin}, #{blog_id}, #{parent_id}, #{root_parent_id})
+    </insert>
+
+    <insert id="saveCommentWithId" parameterType="Comment">
+        insert into blog.comment
+        (comment_id, nickname, email, content, avatar, create_time, fromAdmin, blog_id, parent_id, root_parent_id)
+        value
+        (#{comment_id}, #{nickname}, #{email}, #{content}, #{avatar}, #{create_time}, #{fromAdmin}, #{blog_id}, #{parent_id}, #{root_parent_id})
+    </insert>
+
+    <select id="getComments" parameterType="int" resultType="Comment">
+        select * from blog.comment where comment.blog_id = #{blog_id};
+    </select>
+
+    <select id="getCommentList" resultType="Comment">
+        select * from blog.comment
+    </select>
+
+    <select id="getCommentById" resultType="Comment">
+        select * from blog.comment where comment_id = #{comment_id}
+    </select>
+
+    <delete id="removeCommentById" parameterType="int">
+        delete from blog.comment where comment_id=#{comment_id}
+    </delete>
+
+    <delete id="removeCommentList" parameterType="int">
+        delete from blog.comment where blog_id=#{blog_id};
+    </delete>
+
+    <select id="queryCommentById" parameterType="int" resultType="Comment">
+        select * from blog.comment where comment_id = #{comment_id}
+    </select>
+
+</mapper>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="_fragments :: head(~{::title})">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新增分类</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <link rel="stylesheet" href="../../static/lib/editormd/css/editormd.min.css">
+    <link rel="stylesheet" href="../../static/css/me.css">
+</head>
+<body>
+
+<!--  导航  -->
+<nav th:replace="admin/_admin_fragments :: menu(3)" class="ui inverted attached segment m-padded-tb-mini m-shadow-small" >
+
+</nav>
+
+
+
+<!--  中间  -->
+<div  class="m-container-small m-padded-tb-big animated fadeIn">
+    <div class="ui container">
+        <!-- 提示消息 -->
+        <div class="ui message hidden" id="type-msg">
+            <i class="close icon"></i>
+            <div class="header">提示：</div>
+            <p id="type-msg-content">恭喜，操作成功！</p>
+        </div>
+
+        <!-- 提交的input -->
+        <div class="ui form" th:object="${type}">
+            <input type="hidden" name="type_id"  th:value="${type} != null and *{type_id} != null ? *{type_id} : '-1'">
+            <div class="required field">
+                <div class="ui left fluid labeled input">
+                    <label class="ui teal basic label">名称</label>
+                    <input type="text" name="type_name" placeholder="分类名称" maxlength="20" th:value="${type} != null and *{type_name} != null ? *{type_name} : null">
+                </div>
+            </div>
+            <div class="ui error message"></div>
+            <div class="ui right aligned container">
+                <a href="#" th:href="@{/admin/type}" class="ui circular button" onclick="window.history.go(-1)"><i class="arrow left icon"></i>返回</a>
+                <div class="ui green circular button" onclick="publishType()"><i class="globe icon"></i>发布</div>
+            </div>
+        </div>
+
+<!-- 原来的实现，使用表单，但因为无法在博客发布页面将这段html代码内嵌至modal（主要是因为form在modal中渲染的问题），所以弃用，改成ajax发送请求 -->
+<!--        <form action="#" method="post"  th:object="${type}" th:action="@{/admin/type/input}" class="ui form">-->
+<!--            <input type="hidden" name="type_id" th:value="${type} != null and *{type_id} != null ? *{type_id} : null">-->
+<!--            <div class="required field">-->
+<!--                <div class="ui left labeled input">-->
+<!--                    <label class="ui teal basic label">名称</label>-->
+<!--                    <input type="text" name="type_name" placeholder="分类名称" th:value="${type} != null and *{type_name} != null ? *{type_name} : null">-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--            <div class="ui error message"></div>-->
+<!--            <div class="ui right aligned container">-->
+<!--                <a href="#" th:href="@{/admin/type}" class="ui button">返回</a>-->
+<!--&lt;!&ndash;                <button type="button" class="ui button" onclick="window.history.go(-1)" >返回</button>&ndash;&gt;-->
+<!--                <button class="ui teal type submit button">提交</button>-->
+<!--            </div>-->
+<!--        </form>-->
+
+
+    </div>
+</div>
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+
+<!--  底部footer  -->
+<footer th:replace="_fragments :: footer" class="ui inverted vertical segment m-padded-tb-massive">
+    <div class="ui center aligned container">
+        <div class="ui inverted divided stackable grid">
+            <div class="three wide column">
+                <div class="ui inverted link list">
+                    <div class="item">
+                        <img src="../../static/images/wechaalternatet.jpg" class="ui rounded image" style="width: 100px">
+                    </div>
+                </div>
+            </div>
+            <div class="three wide column">
+                <h4 class="ui inverted header m-text-thin m-text-spaced">最新博客</h4>
+                <div class="ui inverted link list">
+                    <a href="#" class="item">用户故事（User story）</a>
+                    <a href="#" class="item">用户故事（User story）</a>
+                    <a href="#" class="item">用户故事（User story）</a>
+                </div>
+            </div>
+            <div class="three wide column">
+                <h4 class="ui inverted header m-text-thin m-text-spaced">联系我</h4>
+                <div class="ui inverted link list">
+
+                    <a href="#" class="item">Email <i class="envelope outline icon"></i>ryanzhouzw@foxmail.com</a>
+                </div>
+            </div>
+            <div class="seven wide column">
+                <h4 class="ui inverted header m-text-thin m-text-spaced">Blog</h4>
+                <p class="m-text-thin m-text-spaced m-opacity-mini">这是我的个人博客，请多多关注和支持</p>
+            </div>
+        </div>
+
+        <!--分割线-->
+        <div class="ui inverted section divider"></div>
+
+        <p class="m-text-thin m-text-spaced m-opacity-mini">Copyright © 2021</p>
+    </div>
+</footer>
+
+<!--/*/<th:block th:replace="_fragments :: script">/*/-->
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.2/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+<!--/*/</th:block>/*/-->
+<script src="../static/js/type_publish.js" th:src="@{/js/type_publish.js}"></script>
+
+</body>
+</html>

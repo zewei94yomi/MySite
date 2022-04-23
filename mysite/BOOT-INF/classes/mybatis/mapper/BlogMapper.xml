@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zzw.mysite.mapper.BlogMapper">
+
+    <select id="queryBlogById" parameterType="int" resultMap="BlogMap">
+        select
+         b.blog_id as blog_id, b.title as title, b.content as content, b.first_picture as first_picture, b.description as description, b.flag as flag, b.views as views, b.likes as likes,
+         b.appreciation as appreciation, b.shareStatement as shareStatement, b.commentable as commentable, b.published as published,
+         b.recommend as recommend, b.create_time as create_time, b.update_time as update_time,
+         t.type_id as type_id, t.type_name as type_name,
+         u.user_id as user_id, u.nickname as nickname, u.username as username, u.email as email, u.avatar as avatar, u.role as role
+         from
+         blog.blog as b
+         left join blog.blog_type as t on b.type_id = t.type_id
+         left join blog.user as u on b.user_id = u.user_id
+         where b.blog_id = #{blog_id}
+    </select>
+
+    <resultMap id="BlogMap" type="Blog">
+        <id column="blog_id" property="blog_id" />
+        <result column="title" property="title" />
+        <result column="content" property="content" />
+        <result column="first_picture" property="first_picture" />
+        <result column="description" property="description" />
+        <result column="flag" property="flag" />
+        <result column="views" property="views" />
+        <result column="likes" property="likes" />
+        <result column="appreciation" property="appreciation" />
+        <result column="shareStatement" property="shareStatement" />
+        <result column="commentable" property="commentable" />
+        <result column="published" property="published" />
+        <result column="recommend" property="recommend" />
+        <result column="create_time" property="create_time" />
+        <result column="update_time" property="update_time" />
+        <association column="type_id" property="type" javaType="Type">
+            <id column="type_id" property="type_id" />
+            <result column="type_name" property="type_name" />
+        </association>
+        <association column="user_id" property="user" javaType="User">
+            <id column="user_id" property="user_id" />
+            <result column="nickname" property="nickname" />
+            <result column="username" property="username" />
+            <result column="email" property="email" />
+            <result column="avatar" property="avatar" />
+            <result column="role" property="role" />
+        </association>
+    </resultMap>
+
+    <select id="dynamicQueryBlogList" parameterType="map" resultMap="BlogMap">
+        select
+        b.blog_id as blog_id, b.title as title, b.content as content, b.first_picture as first_picture, b.description as description, b.flag as flag, b.views as views, b.likes as likes,
+        b.appreciation as appreciation, b.shareStatement as shareStatement, b.commentable as commentable, b.published as published,
+        b.recommend as recommend, b.create_time as create_time, b.update_time as update_time,
+        t.type_id as type_id, t.type_name as type_name,
+        u.user_id as user_id, u.nickname as nickname, u.username as username, u.email as email, u.avatar as avatar, u.role as role
+        from blog.blog as b
+        left join blog.user as u on b.user_id = u.user_id
+        left join blog.blog_type as t on b.type_id = t.type_id
+        <where>
+            <if test="title != null">
+                and b.title like concat('%', #{title}, '%')
+            </if>
+            <if test="type_id != null">
+                and b.type_id = #{type_id}
+            </if>
+        </where>
+        order by b.create_time desc
+    </select>
+
+    <select id="queryBlogList" resultMap="BlogMap">
+       select
+         b.blog_id as blog_id, b.title as title, b.content as content, b.first_picture as first_picture, b.description as description, b.flag as flag, b.views as views, b.likes as likes,
+         b.appreciation as appreciation, b.shareStatement as shareStatement, b.commentable as commentable, b.published as published,
+         b.recommend as recommend, b.create_time as create_time, b.update_time as update_time,
+         t.type_id as type_id, t.type_name as type_name,
+         u.user_id as user_id, u.nickname as nickname, u.username as username, u.email as email, u.avatar as avatar, u.role as role
+         from
+         blog.blog as b
+         left join blog.blog_type as t on b.type_id = t.type_id
+         left join blog.user as u on b.user_id = u.user_id
+         where b.published = true
+         order by b.create_time desc
+    </select>
+
+    <select id="queryBlogListByTitle" parameterType="String" resultMap="BlogMap">
+        select
+        b.blog_id as blog_id, b.title as title, b.content as content, b.first_picture as first_picture, b.description as description, b.flag as flag, b.views as views, b.likes as likes,
+        b.appreciation as appreciation, b.shareStatement as shareStatement, b.commentable as commentable, b.published as published,
+        b.recommend as recommend, b.create_time as create_time, b.update_time as update_time,
+        t.type_id as type_id, t.type_name as type_name,
+        u.user_id as user_id, u.nickname as nickname, u.username as username, u.email as email, u.avatar as avatar, u.role as role
+        from blog.blog as b
+        left join blog.user as u on b.user_id = u.user_id
+        left join blog.blog_type as t on b.type_id = t.type_id
+        where b.title like concat('%', #{title}, '%')
+        order by b.create_time desc
+    </select>
+
+    <select id="queryBlogListByTypeId" parameterType="int" resultMap="BlogMap">
+        select
+        b.blog_id as blog_id, b.title as title, b.content as content, b.first_picture as first_picture, b.description as description, b.flag as flag, b.views as views, b.likes as likes,
+        b.appreciation as appreciation, b.shareStatement as shareStatement, b.commentable as commentable, b.published as published,
+        b.recommend as recommend, b.create_time as create_time, b.update_time as update_time,
+        t.type_id as type_id, t.type_name as type_name,
+        u.user_id as user_id, u.nickname as nickname, u.username as username, u.email as email, u.avatar as avatar, u.role as role
+        from blog.blog as b
+        left join blog.user as u on b.user_id = u.user_id
+        left join blog.blog_type as t on b.type_id = t.type_id
+        where b.type_id = #{type_id} and b.published = true
+        order by b.create_time desc
+    </select>
+
+    <select id="queryBlogListByTitleATypeId" resultMap="BlogMap">
+        select
+        b.blog_id as blog_id, b.title as title, b.content as content, b.first_picture as first_picture, b.description as description, b.flag as flag, b.views as views, b.likes as likes,
+        b.appreciation as appreciation, b.shareStatement as shareStatement, b.commentable as commentable, b.published as published,
+        b.recommend as recommend, b.create_time as create_time, b.update_time as update_time,
+        t.type_id as type_id, t.type_name as type_name,
+        u.user_id as user_id, u.nickname as nickname, u.username as username, u.email as email, u.avatar as avatar, u.role as role
+        from blog.blog as b
+        left join blog.user as u on b.user_id = u.user_id
+        left join blog.blog_type as t on b.type_id = t.type_id
+        where b.title like concat('%', #{title}, '%') and b.type_id = #{type_id}
+        order by b.create_time desc
+    </select>
+
+    <select id="simpleQueryBlogById" resultType="Blog">
+        select * from blog.blog where blog.blog_id=#{blog_id} order by blog_id
+    </select>
+
+    <select id="simpleQueryBlogList" resultType="Blog">
+        select * from blog.blog order by create_time desc
+    </select>
+
+    <insert id="saveBlog" parameterType="Blog">
+        insert into blog.blog
+        (title, content, first_picture, description, flag, views, likes, appreciation, shareStatement, commentable, published, recommend, create_time, update_time, type_id, user_id)
+        value
+        (#{title}, #{content}, #{first_picture}, #{description}, #{flag}, #{views}, #{likes}, #{appreciation}, #{shareStatement}, #{commentable}, #{published}, #{recommend}, #{create_time}, #{update_time}, #{type.type_id}, #{user.user_id})
+    </insert>
+
+    <update id="updateBlog" parameterType="Blog">
+        update blog.blog set
+         title = #{title}, content = #{content}, first_picture = #{first_picture}, views = #{views}, likes = #{likes}, description = #{description}, flag = #{flag},
+         appreciation = #{appreciation}, shareStatement = #{shareStatement}, commentable = #{commentable},
+         published = #{published}, recommend = #{recommend}, update_time = #{update_time},
+         type_id = #{type.type_id}
+        where blog_id = #{blog_id}
+    </update>
+
+    <delete id="removeBlog" parameterType="int">
+        delete from blog.blog where blog_id=#{blog.id}
+    </delete>
+
+    <select id="queryNewBlogId" resultType="int">
+        select a.blog_id from blog.blog a,
+        (select max(create_time) maxTime from blog.blog) b
+        where a.create_time = b.maxTime
+    </select>
+
+    <select id="queryNewRecommendBlogList" parameterType="int" resultType="BlogView">
+        select b.blog_id, b.title, b.update_time, b.create_time
+        from blog.blog b
+        where b.recommend = true
+        order by b.update_time desc
+        limit #{topSize}
+    </select>
+
+    <select id="searchBlogListByKey" parameterType="String" resultMap="BlogMap">
+        select
+        b.blog_id as blog_id, b.title as title, b.content as content, b.first_picture as first_picture, b.description as description, b.flag as flag, b.views as views, b.likes as likes,
+        b.appreciation as appreciation, b.shareStatement as shareStatement, b.commentable as commentable, b.published as published,
+        b.recommend as recommend, b.create_time as create_time, b.update_time as update_time,
+        t.type_id as type_id, t.type_name as type_name,
+        u.user_id as user_id, u.nickname as nickname, u.username as username, u.email as email, u.avatar as avatar, u.role as role
+        from blog.blog as b
+        left join blog.user as u on b.user_id = u.user_id
+        left join blog.blog_type as t on b.type_id = t.type_id
+        where b.title like concat('%', #{key}, '%')
+            or b.description like concat('%', #{key}, '%')
+            or b.content like concat('%', #{key}, '%')
+        order by b.create_time desc
+    </select>
+
+    <update id="viewBlog" parameterType="int">
+        update blog.blog set views = views + 1 where blog_id = #{blog_id}
+    </update>
+
+    <select id="queryBlogLikes" parameterType="int" resultType="int">
+        select likes from blog.blog where blog_id = #{blog_id}
+    </select>
+
+    <update id="likeBlog" parameterType="int">
+        update blog.blog set likes = likes + 1 where blog_id = #{blog_id}
+    </update>
+
+    <update id="cancelLikeBlog" parameterType="int">
+        update blog.blog set likes = likes - 1 where blog_id = #{blog_id}
+    </update>
+
+    <select id="queryBlogByTagId" parameterType="int" resultMap="BlogMap">
+        select * from
+            (select * from blog.blog2tag
+            where tag_id = #{tag_id}) as t1
+            left join (select
+                   b.blog_id as blog_id, b.title as title, b.content as content, b.first_picture as first_picture, b.description as description, b.flag as flag, b.views as views, b.likes as likes,
+                   b.appreciation as appreciation, b.shareStatement as shareStatement, b.commentable as commentable, b.published as published,
+                   b.recommend as recommend, b.create_time as create_time, b.update_time as update_time,
+                   t.type_id as type_id, t.type_name as type_name,
+                   u.user_id as user_id, u.nickname as nickname, u.username as username, u.email as email, u.avatar as avatar, u.role as role
+               from
+                   blog.blog as b
+                       left join blog.blog_type as t on b.type_id = t.type_id
+                       left join blog.user as u on b.user_id = u.user_id
+                where b.published = true
+               order by blog_id) as t2 on t1.blog_id = t2.blog_id
+               order by t2.create_time desc
+    </select>
+
+    <select id="queryBlogArchive" resultType="BlogView">
+        select b.blog_id, b.title, t.type_id, t.type_name, b.update_time, b.create_time
+        from blog.blog b
+        left join blog.blog_type t on b.type_id = t.type_id
+        where b.published = true
+        order by b.create_time desc
+    </select>
+</mapper>

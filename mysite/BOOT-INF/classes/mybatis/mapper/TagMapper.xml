@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zzw.mysite.mapper.TagMapper">
+
+    <insert id="saveTag" parameterType="Tag" >
+        insert into blog.blog_tag
+        (tag_name)
+        values
+        (#{tag_name});
+    </insert>
+
+    <delete id="removeTagById" parameterType="int">
+        delete from blog.blog_tag where tag_id = #{tag_id}
+    </delete>
+
+    <delete id="removeTagByName" parameterType="String">
+        delete from blog.blog_tag where tag_name = #{tag_name}
+    </delete>
+
+    <select id="queryTagById" parameterType="int" resultType="Tag">
+        select * from blog.blog_tag where tag_id = #{tag_id}
+    </select>
+
+    <select id="queryTagByName" resultType="Tag" parameterType="String">
+        select * from blog.blog_tag where tag_name = #{tag_name}
+    </select>
+
+    <update id="updateTag" parameterType="Tag">
+        update blog.blog_tag set tag_name=#{tag_name} where tag_id=#{tag_id}
+    </update>
+
+    <select id="queryTagList" resultType="Tag">
+        select * from blog.blog_tag
+    </select>
+
+    <select id="queryTagViewListByTopLimit" parameterType="int" resultType="TagView">
+        select t.tag_id, t.tag_name, count(bt.blog_id) as blog_num
+        from blog.blog_tag as t
+        left join blog.blog2tag as bt on t.tag_id = bt.tag_id
+        left join blog.blog as b on bt.blog_id = b.blog_id
+        where b.published = true
+        group by t.tag_id
+        order by blog_num desc
+        limit #{topSize}
+    </select>
+
+    <select id="queryTagViewList" resultType="TagView">
+        select t.tag_id, t.tag_name, count(bt.blog_id) as blog_num
+        from blog.blog_tag as t
+        left join blog.blog2tag as bt on t.tag_id = bt.tag_id
+        group by t.tag_id
+        order by blog_num desc
+    </select>
+
+</mapper>

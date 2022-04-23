@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<!--  头部  -->
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:replace="${title}">前台模板</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <script src="https://kit.fontawesome.com/38090a0899.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="../static/css/me.css" th:href="@{/css/me.css}">
+    <link rel="stylesheet" href="../static/css/typo.css" th:href="@{/css/typo.css}">
+    <link rel="stylesheet" href="../static/css/animate.css" th:href="@{/css/animate.css}">
+    <link rel="stylesheet" href="../static/lib/prism/prism.css" th:href="@{/lib/prism/prism.css}">
+    <link rel="stylesheet" href="../static/lib/tocbot/tocbot.css" th:href="@{/lib/tocbot/tocbot.css}">
+    <link rel="stylesheet" href="../static/css/slideVal.css" th:href="@{/css/slideVal.css}">
+    <link rel="stylesheet" href="../static/font/iconfont.css" th:href="@{/font/iconfont.css}">
+    <link rel="stylesheet" href="../static/font/icon/iconfont.css" th:href="@{/font/icon/iconfont.css}">
+    <link rel="stylesheet" href="../static/lib/editormd/css/editormd.min.css" th:href="@{/lib/editormd/css/editormd.min.css}">
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+</head>
+<body>
+
+<!--  导航  -->
+<nav th:fragment="menu(n)" class="ui inverted attached segment m-padded-tb-mini m-shadow-small">
+    <div class="ui container">
+        <div class="ui inverted secondary stackable menu">
+            <h2 class="ui teal header item">Blog</h2>
+            <a href="#" th:href="@{/}"class="m-item item m-mobile-hide" th:classappend="${n==1} ? 'active'"><i class="home icon"></i>首页</a>
+            <a href="#" th:href="@{/types/{id}(id=-1)}" class="m-item item m-mobile-hide" th:classappend="${n==2} ? 'active'"><i class="idea icon"></i>分类</a>
+            <a href="#" th:href="@{/tags/{id}(id=-1)}" class="m-item item m-mobile-hide" th:classappend="${n==3} ? 'active'"><i class="tags icon"></i>标签</a>
+            <a href="#" th:href="@{/archive}" class="m-item item m-mobile-hide" th:classappend="${n==4} ? 'active'"><i class="clone icon"></i>归档</a>
+            <a href="#" th:href="@{/about}" class="m-item item m-mobile-hide" th:classappend="${n==5} ? 'active'"><i class="info icon"></i>关于我</a>
+            <a href="#" class="m-item item m-mobile-hide" th:href="@{/admin/index}" th:if="${session.loginUser != null}"><i class="user icon"></i>后台</a>
+
+            <div class="right m-item m-mobile-hide menu" th:if="${session.loginUser != null}">
+                <div class="ui dropdown item">
+                    <div class="text">
+                        <img class="ui avatar image" src="https://unsplash.it/100/100?image=1005" th:src="${session.loginUser.avatar}">
+                        <span th:text="${session.loginUser.nickname}"></span>
+                    </div>
+                    <i class="dropdown icon"></i>
+                    <div class="menu">
+                        <a href="#" th:href="@{/admin/settings}" class="item" style="text-align: center">个人设置</a>
+                        <a href="#" th:href="@{/admin/pwd}" class="item" style="text-align: center">修改密码</a>
+                        <a href="#" th:href="@{/admin/logout_back}" class="item" style="text-align: center">退出登录</a>
+                    </div>
+                </div>
+            </div>
+            <div class="right m-item item m-mobile-hide">
+                <form name="search" action="#" th:action="@{/search}" method="post" target="_blank">
+                    <div class="ui icon inverted transparent input m-margin-tb-tiny">
+                        <input type="text" name="key" placeholder="Search....">
+                        <i onclick="document.forms['search'].submit()" class="search link icon"></i>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <a href="#" class="ui menu toggle black icon button m-right-top m-mobile-show">
+        <i class="sidebar icon"></i>
+    </a>
+</nav>
+
+<!--  个人卡片  -->
+<div th:fragment="card" class="ui card fluid">
+    <div class="image">
+        <img src="https://unsplash.it/800/600?image=1005" th:src="${user.avatar}">
+    </div>
+    <div class="content">
+        <a class="header" th:text="${user.nickname}">Kristy</a>
+        <div class="meta m-padded-tb-medium">
+            <span class="date">2021年创建</span>
+        </div>
+        <div class="description" th:text="${userInfo.aboutMe}">
+            Kristy is an art director living in New York.
+        </div>
+    </div>
+    <div class="extra content">
+        <a href="#" th:href="@{/}"><i class="fas fa-blog"></i> 共发布 <span th:text="${totalBlog}" class="ui orange header">22</span> 篇博客 </a>
+    </div>
+    <div class="extra content">
+        <div class="ui tag labels">
+            <div class="ui blue label m-margin-tb-tiny m-padded-lr-small" th:each="tag : ${userInfo.myTagList}" th:text="${tag}">编程</div>
+            <!--/*-->
+            <div class="ui blue label m-margin-tb-tiny m-padded-lr-small">健身</div>
+            <div class="ui blue label m-margin-tb-tiny m-padded-lr-small">音乐</div>
+            <!--*/-->
+        </div>
+    </div>
+
+    <!-- 个人链接 -->
+    <div class="extra content">
+        <div class="ui clickPopup circular icon button" th:data-content="${user.email}" ><i class="iconfont grey icon-email"></i></div>
+        <div class="ui clickPopup circular icon button" th:data-content="${user.github}" ><i class="iconfont icon-GitHub"></i></div>
+        <div class="ui clickPopup circular icon button" th:data-content="${user.linkedin}" ><i class="iconfont icon-social-_logo-linkedin"></i></div>
+        <div class="ui clickPopup circular icon button" th:data-content="${user.csdn}"><i class="iconfont icon-csdn1"></i></div>
+        <div class="ui wechatPay circular icon button"><i class="iconfont icon-weixin1"></i></div>
+        <div class="ui alipayPay circular icon button" ><i class="iconfont icon-zhifubao2"></i></div>
+        <!--                        <div class="ui wechatPay circular icon button" style="width: 36px; height: 36px">-->
+        <!--&lt;!&ndash;                                <span style="font-size: 1.35em;">&ndash;&gt;-->
+        <!--&lt;!&ndash;                                    <i class="fab fa-weixin"></i>&ndash;&gt;-->
+        <!--&lt;!&ndash;                                </span>&ndash;&gt;-->
+        <!--                            <i class="fab fa-weixin"></i>-->
+        <!--                        </div>-->
+        <!--                        <div class="ui alipayPay circular icon button" style="width: 36px; height: 36px">-->
+        <!--                            <i class="fab fa-alipay"></i>-->
+        <!--                        </div>-->
+    </div>
+
+    <!-- 微信：隐藏的二维码 -->
+    <div class="ui wechatPayQR flowing popup transition hidden" style="width: 240px">
+        <!--二维码图片-->
+        <div class="ui basic label">
+            <div class="ui images" style="font-size: inherit !important;">
+                <div class="image">
+                    <img src="../static/images/wechatpay.jpg" th:src="@{/images/wechatpay.jpg}" alt="" class="ui rounded border image" >
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 支付宝：隐藏的二维码 -->
+    <div class="ui alipayPayQR flowing popup transition hidden" style="width: 240px">
+        <!--二维码图片-->
+        <div class="ui basic label">
+            <div class="ui images" style="font-size: inherit !important;">
+                <div class="image">
+                    <img src="../static/images/alipay.jpg" th:src="@{/images/alipay.jpg}" alt="" class="ui rounded border image" >
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--  博客显示列表  -->
+<div th:fragment="blogList(content)" class="ui attached segment">
+    <div th:if="${pageInfo} != null and ${pageInfo.list} != null">
+        <div th:each="blog : ${pageInfo.list}"  class="ui padded vertical segment m-padded-tb-large m-padded">
+            <div class="ui middle aligned mobile reversed stackable grid">
+                <div class="eleven wide column">
+                    <h3 class="ui header"><a href="#" th:href="@{/blog/{id}(id=${blog.blog_id})}" th:text="${blog.title}" target="_blank" class="m-black">你真的理解什么是财富自由吗？</a> </h3>
+                    <p class="m-text m-grey" th:text="|${blog.description}......|">正确做好任何一件事情的前提是清晰、正确的理解目标。而事实是，我们很多人很多时候根本没有对目标正确的定义，甚至根本从来就没有想过，只是大家都那么做而已…...</p>
+                    <div class="ui stackable grid">
+                        <!-- 作者头像 + 昵称 -->
+                        <div class="seven wide column left aligned ">
+                            <div class="m-padded-tb-tiny">
+                                <div class="ui horizontal link list ">
+                                    <div class="item">
+                                        <!-- 作者信息：头像+昵称 -->
+                                        <img src="https://unsplash.it/100/100?image=1005" alt="" th:src="${blog.user.avatar}" class="ui avatar image">
+                                        <div class="content">
+                                            <a href="#" class="header" th:text="${blog.user.nickname}">李仁密</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 博客分类 -->
+                        <div class="nine wide column right aligned" th:if="${content} == 'type'">
+                            <div class="m-padded-tb-tiny">
+                                <div class="ui labels">
+                                    <a href="#" th:href="@{types/{id}(id=${blog.type.type_id})}" class="ui teal label" th:text="${blog.type.type_name}" th:if="${blog.type} != null">分类</a>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 博客标签 -->
+                        <div class="nine wide column right aligned" th:if="${content} == 'tag'">
+                            <div class="m-padded-tb-tiny">
+                                <div class="ui tag labels">
+                                    <a href="#" th:each="tag : ${blog.tags}" th:href="@{/tags/{id}(id=${tag.tag_id})}" class="ui blue m-text-small tag label" th:if="${tag} != null">
+                                        <span class="m-tag-padded-l" th:text="${tag.tag_name}">认知升级</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 四大数据：创建时间、访问、点赞、评论 -->
+                    <div class="ui horizontal link list">
+                            <!-- 创建时间 -->
+                            <div class="item">
+                                <i class="calendar alternate outline icon"></i><span  th:text="${#dates.format(blog.create_time, 'yyyy-MM-dd')}" class="vertical-aligned-middle m-text-size-big">2017-10-01</span>
+                            </div>
+                            <!-- 访问量 -->
+                            <div class="item">
+                                <i class="eye icon"></i><span th:text="${blog.views}" class="vertical-aligned-middle m-text-size-big">2342</span>
+                            </div>
+                            <!-- 点赞数 -->
+                            <div class="item">
+                                <i class="thumbs up outline icon"></i><span th:text="${blog.likes}" class="vertical-aligned-middle m-text-size-big">23</span>
+                            </div>
+                            <!-- 评论数 -->
+                            <div class="item" th:if="${blog.commentable}">
+                                <i class="comment alternate icon"></i><span th:text="${blog.commentNum}" class="vertical-aligned-middle m-text-size-big">5</span>
+                            </div>
+                        </div>
+
+                </div>
+                <!--首图-->
+                <div class="five wide column">
+                    <img src="https://unsplash.it/800/450?image=1005" alt="" th:src="${blog.first_picture}" class="ui rounded centered image">
+                </div>
+            </div>
+        </div>
+        <!--/*-->
+        <div class="ui padded vertical segment m-padded-tb-large m-padded">
+            <div class="ui middle aligned mobile reversed stackable grid">
+                <div class="eleven wide column">
+                    <h3 class="ui header">你真的理解什么是财富自由吗？</h3>
+                    <p class="m-text">正确做好任何一件事情的前提是清晰、正确的理解目标。而事实是，我们很多人很多时候根本没有对目标正确的定义，甚至根本从来就没有想过，只是大家都那么做而已…...</p>
+                    <div class="ui grid">
+                        <div class="eight wide column left aligned">
+                            <div class="ui horizontal link list">
+                                <div class="item">
+                                    <img src="https://unsplash.it/100/100?image=1005" alt="" class="ui avatar image">
+                                    <div class="content"><a href="#" class="header">李仁密</a></div>
+                                </div>
+                                <div class="item">
+                                    <i class="calendar icon"></i> 2017-10-01
+                                </div>
+                            </div>
+                        </div>
+                        <div class="eight wide column right aligned">
+                            <a href="#"  class="ui teal m-text-small tag label">认知升级</a>
+                        </div>
+                    </div>
+                    <div class="ui horizontal link list">
+                        <!-- 访问量 -->
+                        <div class="item">
+                            <i class="eye icon"></i><span>2342</span>
+                        </div>
+                        <!-- 点赞数 -->
+                        <div class="item">
+                            <i class="thumbs up outline icon"></i><span>23</span>
+                        </div>
+                        <!-- 评论数 -->
+                        <div class="item">
+                            <i class="comment alternate icon"></i><span>5</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="five wide column">
+                    <a href="#" >
+                        <img src="https://unsplash.it/800/450?image=1005" alt="" class="ui rounded image">
+                    </a>
+                </div>
+
+            </div>
+        </div>
+        <div class="ui padded vertical segment m-padded-tb-large m-padded">
+            <div class="ui middle aligned mobile reversed stackable grid">
+                <div class="eleven wide column">
+                    <h3 class="ui header">你真的理解什么是财富自由吗？</h3>
+                    <p class="m-text">正确做好任何一件事情的前提是清晰、正确的理解目标。而事实是，我们很多人很多时候根本没有对目标正确的定义，甚至根本从来就没有想过，只是大家都那么做而已…...</p>
+                    <div class="ui grid">
+                        <div class="eight wide column left aligned">
+                            <div class="ui horizontal link list">
+                                <div class="item">
+                                    <img src="https://unsplash.it/100/100?image=1005" alt="" class="ui avatar image">
+                                    <div class="content"><a href="#" class="header">李仁密</a></div>
+                                </div>
+                                <div class="item">
+                                    <i class="calendar icon"></i> 2017-10-01
+                                </div>
+                            </div>
+                        </div>
+                        <div class="eight wide column right aligned">
+                            <a href="#"  class="ui teal m-text-small tag label">认知升级</a>
+                        </div>
+                    </div>
+                    <div class="ui horizontal link list">
+                        <!-- 访问量 -->
+                        <div class="item">
+                            <i class="eye icon"></i><span>2342</span>
+                        </div>
+                        <!-- 点赞数 -->
+                        <div class="item">
+                            <i class="thumbs up outline icon"></i><span>23</span>
+                        </div>
+                        <!-- 评论数 -->
+                        <div class="item">
+                            <i class="comment alternate icon"></i><span>5</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="five wide column">
+                    <a href="#" >
+                        <img src="https://unsplash.it/800/450?image=1005" alt="" class="ui rounded image">
+                    </a>
+                </div>
+
+            </div>
+        </div>
+        <!--*/-->
+    </div>
+</div>
+
+<!--  分页  -->
+<div th:fragment="page" class="ui bottom attached segment">
+    <div class="ui mini pagination menu">
+        <div th:if="${pageInfo.hasPreviousPage}">
+            <div class="column">
+                <a href="#" th:href="'?pageNo=1'" class="item">首页</a>
+            </div>
+        </div>
+        <div th:if="${pageInfo.hasPreviousPage}">
+            <div class="column">
+                <a href="#" th:href="'?pageNo=' + ${pageInfo.prePage}" class="item">上一页</a>
+            </div>
+        </div>
+        <div th:each="nav : ${pageInfo.navigatepageNums}">
+            <a th:href="'?pageNo='+${nav}" th:text="${nav}" th:if="${nav != pageInfo.pageNum}" class="item"></a>
+            <span style="font-weight: bold" th:if="${nav == pageInfo.pageNum}" th:text="${nav}" class="item"></span>
+        </div>
+        <div th:if="${pageInfo.hasNextPage}">
+            <div class="column">
+                <a href="#" th:href="'?pageNo=' + ${pageInfo.nextPage}" class="item">下一页</a>
+            </div>
+        </div>
+        <div th:if="${pageInfo.hasNextPage}">
+            <div class=" column">
+                <a href="#" th:href="'?pageNo=' + ${pageInfo.pages}" class="item">尾页</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--  底部footer  -->
+<footer th:fragment="footer" class="ui inverted vertical segment m-padded-tb-massive">
+    <div class="ui center aligned container" id="footer-container" th:fragment="footerInfo">
+        <div class="ui inverted divided stackable grid">
+<!--            <div class="two wide column">-->
+<!--                <div class="ui inverted link list">-->
+<!--                    <div class="item">-->
+<!--                        <img src="../static/images/wechat.jpg" th:src="@{/images/wechat.jpg}" class="ui rounded image" style="width: 100px">-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+            <div class="six wide column">
+                <h4 class="ui inverted header m-text-thin m-text-spaced">最新推荐博客</h4>
+                <div class="ui inverted link list">
+                    <a href="#" target="_blank" th:href="@{/blog/{id}(id=${blog.blog_id})}" class="item" th:each="blog : ${newBlogList}" th:text="${#strings.abbreviate(blog.title,25)}">用户故事（User story）</a>
+                    <!--/*-->
+                    <a href="#" class="item">用户故事（User story）</a>
+                    <a href="#" class="item">用户故事（User story）</a>
+                    <!--*/-->
+                </div>
+            </div>
+            <div class="four wide column">
+                <h4 class="ui inverted header m-text-thin m-text-spaced">联系我</h4>
+                <div class="ui inverted link list">
+                    <div class="item">
+                        <div>
+                            <i class="envelope icon"></i>Email:<div th:text="${email}">ryanzhouzw@foxmail.com</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="six wide column">
+                <h4 class="ui inverted header m-text-thin m-text-spaced">Blog</h4>
+                <p class="m-text-thin m-text-spaced m-opacity-mini" th:text="${aboutBlog}">这是我的个人博客，请多多关注和支持</p>
+            </div>
+        </div>
+
+        <!--分割线-->
+        <div class="ui inverted section divider"></div>
+
+        <p class="m-text-thin m-text-spaced m-opacity-mini">Copyright © 2021</p>
+        <p class="m-text-thin m-text-spaced m-opacity-mini">备案/许可证编号：浙ICP备2021024109号</p>
+    </div>
+</footer>
+
+<!--  Scripts  -->
+<th:block th:fragement="script">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.2/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery-serialize-object/2.5.0/jquery.serialize-object.min.js"></script>
+    <script src="../static/lib/prism/prism.js" th:src="@{/lib/prism/prism.js}"></script>
+    <script src="../../static/lib/editormd/editormd.min.js" th:src="@{/lib/editormd/editormd.min.js}"></script>
+    <script src="../static/lib/tocbot/tocbot.min.js" th:src="@{/lib/tocbot/tocbot.min.js}"></script>
+    <script src="../static/lib/qrcode/qrcode.min.js" th:src="@{/lib/qrcode/qrcode.min.js}"></script>
+    <script src="//cdn.jsdelivr.net/npm/jquery.scrollto@2.1.2/jquery.scrollTo.min.js"></script>
+    <script src="../static/lib/waypoints/jquery.waypoints.min.js" th:src="@{/lib/waypoints/jquery.waypoints.min.js}"></script>
+    <script src="../static/js/utils.js" th:src="@{/js/utils.js}"></script>
+    <script src="../static/js/donate.js" th:src="@{/js/donate.js}"></script>
+    <script src="../static/js/slideVal.js" th:src="@{/js/slideVal.js}"></script>
+    <script src="../static/js/blogPage.js" th:src="@{/js/blogPage.js}"></script>
+    <script src="../static/js/blogComment.js" th:src="@{/js/blogComment.js}"></script>
+
+
+    <script th:inline="javascript">
+        // 加载footer里的最新博客
+        $(function () {
+            var url = /*[[@{/footer}]]*/"";
+            $('#footer-container').load(url);
+        })
+    </script>
+
+</th:block>
+
+</body>
+</html>

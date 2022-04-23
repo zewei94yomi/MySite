@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="_fragments :: head(~{::title})">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>博客管理</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <link rel="stylesheet" href="../../static/css/me.css">
+</head>
+<body>
+
+<!--  导航  -->
+<nav th:replace="admin/_admin_fragments :: menu(2)" class="ui inverted attached segment m-padded-tb-mini m-shadow-small">
+</nav>
+
+<!--  中间  -->
+<div class="m-container m-padded-tb-large animated fadeIn">
+    <div class="ui container" id="blog-container">
+        <!-- 提示消息 -->
+        <div class="ui success message" th:unless="${#strings.isEmpty(message)}">
+            <i class="close icon"></i>
+            <div class="header">提示：</div>
+            <p>标题为  <b th:text="${blogTitle}">如何健身</b>  <span th:text="${message}">的博客发布成功！</span> <a href="#" th:href="@{/blog/{id}(id=${newBlogId})}" th:if="${newBlogId} != null">查看原文</a></p>
+        </div>
+
+        <!-- 搜索栏 -->
+        <form action="#" th:action="@{/admin/blog}" method="get" class="ui secondary segment form">
+            <div class="fields inline">
+                <div class="field">
+                    <input type="text" name="title" placeholder="标题" class="blog_title" th:value="${title}">
+                </div>
+                <div class="field">
+                    <div class="ui labeled action input">
+                        <div class="ui type selection dropdown">
+                            <input type="hidden" name="type_id" th:value="${type_id}">
+                            <i class="dropdown icon"></i>
+                            <div class="default text">分类</div>
+                            <div class="menu">
+                                <div th:each="type : ${types}" class="item" data-value="1" th:data-value="${type.type_id}" th:text="${type.type_name}">错误日志</div>
+                                <!--/*-->
+                                <div class="item" data-value="2">开发者手册</div>
+                                <!--*/-->
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 这里必须为"清除"按钮的button标签加上 type="button"，否则在点击后会自动提交表单 -->
+                    <button type="button" id="clear-btn" class="ui grey  icon circular button"><i class="undo alternate icon"></i></button>
+                    <button class="ui teal  icon circular button"><i class="search icon"></i></button>
+                </div>
+            </div>
+        </form>
+
+        <!-- 博客列表 -->
+        <div th:fragment="blogList">
+            <table class="ui compact teal table">
+                <div class="ui middle aligned two column grid">
+                    <div class="column">
+                        <h2 class="ui dividing header">博客</h2>
+                    </div>
+                    <div class="right aligned column">
+                        共 <h2 class="ui orange header m-inline-block m-text-thin" th:text="${pageInfo.total}">14</h2> 篇
+                    </div>
+                </div>
+                <thead>
+                <tr>
+                    <th></th>
+                    <th>标题</th>
+                    <th>分类</th>
+                    <th>状态</th>
+                    <th>访问量</th>
+                    <th>创建时间</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="blog, iterStat : ${pageInfo.list}">
+                    <td th:text="${(pageInfo.pageNum - 1) * pageInfo.pageSize + iterStat.count}">1</td>
+                    <td>
+                        <a href="#" target="_blank" th:href="@{/blog/{id}(id=${blog.blog_id})}" th:text="${#strings.abbreviate(blog.title,30)}">
+                            刻意练习
+                        </a>
+                    </td>
+                    <td th:text="${blog.type} == null ? '无' : ${blog.type.type_name}">认知升级</td>
+                    <td th:text="${blog.published} == true ? '发布' : '草稿'" th:classappend="${blog.published} == true ? 'm-text-red' : 'm-text-gray'">发布</td>
+                    <td th:text="${blog.views}">999+</td>
+                    <td th:text="${#dates.format(blog.create_time, 'yyyy-MM-dd &nbsp HH:mm:ss')}">2021</td>
+                    <td>
+                        <a href="#" target="_blank" th:href="@{/blog/{id}(id=${blog.blog_id})}" class="ui blue icon circular button"><i class="file alternate icon"></i></a>
+                        <a href="#" th:href="@{/admin/blog/update/{id}(id=${blog.blog_id})}" class="ui yellow icon circular button"><i class="edit icon"></i></a>
+                        <div th:attr="data-blogid=${blog.blog_id}" class="ui red icon circular button" onclick="deleteBlog(this)"><i class="trash alternate icon"></i></div>
+                    </td>
+                </tr>
+                </tbody>
+                <tfoot>
+                <tr>
+                    <th colspan="7">
+                        <div class="ui mini pagination menu">
+                            <div th:if="${pageInfo.hasPreviousPage}">
+                                <a th:href="${filter} == true ? '?title=' + ${title} + '&type_id=' + ${type_id} + '&pageNo=1' : '?pageNo=1'" class="item">首页</a>
+                            </div>
+                            <div th:if="${pageInfo.hasPreviousPage}">
+                                <a th:href="${filter} == true ? '?title=' + ${title} + '&type_id=' + ${type_id} + '&pageNo='+${pageInfo.prePage} : '?pageNo='+${pageInfo.prePage}" class="item">上一页</a>
+                            </div>
+                            <div th:each="nav : ${pageInfo.navigatepageNums}">
+                                <a th:href="${filter} == true ? '?title=' + ${title} + '&type_id=' + ${type_id} + '&pageNo='+${nav} :'?pageNo='+${nav}" th:text="${nav}" th:if="${nav != pageInfo.pageNum}" class="item"></a>
+                                <span style="font-weight: bold" th:if="${nav == pageInfo.pageNum}" th:text="${nav}" class="item"></span>
+                            </div>
+                            <div th:if="${pageInfo.hasNextPage}">
+                                <a th:href="${filter} == true ? '?title=' + ${title} + '&type_id=' + ${type_id} + '&pageNo='+${pageInfo.nextPage} : '?pageNo='+${pageInfo.nextPage}" class="item">下一页</a>
+                            </div>
+                            <div th:if="${pageInfo.hasNextPage}">
+                                <a th:href="${filter} == true ? '?title=' + ${title} + '&type_id=' + ${type_id} + '&pageNo='+${pageInfo.pages} : '?pageNo='+${pageInfo.pages}" class="item">尾页</a>
+                            </div>
+
+                        </div>
+                        <a href="#" class="ui right floated green icon circular button" th:href="@{/admin/blog/publish}"><i class="plus icon"></i></a>
+                    </th>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+
+    </div>
+
+</div>
+
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+<!-- 确认删除 -->
+<div class="ui container">
+    <div class="ui tiny basic modal">
+        <i class="close icon"></i>
+        <div class="header">确定删除该博客吗？</div>
+        <div class="content">
+            博客删除后其评论也将一并删除，是否确定删除？
+        </div>
+        <div class="actions">
+            <div class="ui red deny button">
+                取消
+            </div>
+            <div class="ui positive right labeled icon button">
+                确认
+                <i class="checkmark icon"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--  底部footer  -->
+<footer th:replace="_fragments :: footer" class="ui inverted vertical segment m-padded-tb-massive">
+    <div class="ui center aligned container">
+        <div class="ui inverted divided stackable grid">
+            <div class="three wide column">
+                <div class="ui inverted link list">
+                    <div class="item">
+                        <img src="../../static/images/wechat.jpg" class="ui rounded image" style="width: 100px">
+                    </div>
+                </div>
+            </div>
+            <div class="three wide column">
+                <h4 class="ui inverted header m-text-thin m-text-spaced">最新博客</h4>
+                <div class="ui inverted link list">
+                    <a href="#" class="item">用户故事（User story）</a>
+                    <a href="#" class="item">用户故事（User story）</a>
+                    <a href="#" class="item">用户故事（User story）</a>
+                </div>
+            </div>
+            <div class="three wide column">
+                <h4 class="ui inverted header m-text-thin m-text-spaced">联系我</h4>
+                <div class="ui inverted link list">
+
+                    <a href="#" class="item">Email <i class="envelope outline icon"></i>ryanzhouzw@foxmail.com</a>
+                </div>
+            </div>
+            <div class="seven wide column">
+                <h4 class="ui inverted header m-text-thin m-text-spaced">Blog</h4>
+                <p class="m-text-thin m-text-spaced m-opacity-mini">这是我的个人博客，请多多关注和支持</p>
+            </div>
+        </div>
+
+        <!--分割线-->
+        <div class="ui inverted section divider"></div>
+
+        <p class="m-text-thin m-text-spaced m-opacity-mini">Copyright © 2021</p>
+    </div>
+</footer>
+
+<th:block th:replace="_fragments :: script">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.2/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+</th:block>
+
+<script th:inline="javascript">
+
+    $('#clear-btn')
+        .on('click', function() {
+            $('.ui.type.dropdown')
+                .dropdown('clear')
+            ;
+            $('.blog_title').val("");
+        });
+
+    function deleteBlog(obj) {
+        var blogId = $(obj).data('blogid');
+        var url = /*[[@{/admin/blog/delete}]]*/"";
+        url += "/" + blogId;
+        console.log("删除请求URL：" + url);
+        confirmDelete(url);
+    }
+
+</script>
+</body>
+</html>

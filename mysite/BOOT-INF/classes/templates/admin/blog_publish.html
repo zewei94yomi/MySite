@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="_fragments :: head(~{::title})">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>博客发布</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <link rel="stylesheet" href="../../static/lib/editormd/css/editormd.min.css">
+    <link rel="stylesheet" href="../../static/css/me.css">
+</head>
+<body>
+
+<!--  导航  -->
+<nav th:replace="admin/_admin_fragments :: menu(2)" class="ui inverted attached segment m-padded-tb-mini m-shadow-small" ></nav>
+
+<!--  中间  -->
+<div class="m-container-big m-padded-tb-large animated fadeIn">
+    <div class="ui m-container-big">
+        <!-- 博客发布的form -->
+        <form id="blog_form" action="#" th:object="${blog}" th:action="@{/admin/blog/input}" method="post" class="ui form">
+            <input type="hidden" name="blog_id" th:value="${blog} != null ? *{blog_id} : null">
+            <input type="hidden" name="published" th:value="${blog} != null ? *{published} : false">
+            <!-- 博客的flag -->
+            <div class="required field">
+                <div class="ui left labeled input">
+                    <div class="ui selection compact dropdown teal basic label" style="z-index: 11" >
+                        <input type="hidden" value="原创" name="flag" th:value="${blog} != null ? *{flag} : '原创'">
+                        <i class="dropdown icon"></i>
+                        <div class="text">原创</div>
+                        <div class="menu">
+                            <div class="item" data-value="原创">原创</div>
+                            <div class="item" data-value="转载">转载</div>
+                            <div class="item" data-value="翻译">翻译</div>
+                        </div>
+                    </div>
+                    <input type="text" name="title" placeholder="标题" maxlength="40" th:value="${blog} != null ? *{title} : ''">
+                </div>
+            </div>
+            <!-- 正文区域 -->
+            <div class="required field">
+                <div id="md-content">
+                    <textarea name="content" placeholder="内容" style="display: none" th:text="${blog} != null ? *{content} : ''"></textarea>
+                </div>
+            </div>
+            <!-- 分类/标签 -->
+            <div class="two fields">
+                <!-- 分类（如果是发布，必填） -->
+                <div class="required field">
+                    <div class="ui left labeled action input">
+                        <label class="ui compact teal basic label">分类</label>
+                        <div class="ui fluid selection dropdown">
+                            <input type="hidden" name="type.type_id" th:value="*{type}!=null ? *{type.type_id}">
+                            <i class="dropdown icon"></i>
+                            <div class="default text">分类</div>
+                            <div class="menu" id="type-menu">
+                                <div th:fragment="typeMenu" th:each="type : ${types}" class="item" data-value="1" th:data-value="${type.type_id}" th:text="${type.type_name}">错误日志</div>
+                            </div>
+                        </div>
+                        <div class="ui icon green button" onclick="openTypeModal()"><i class="plus icon"></i></div>
+                    </div>
+                    <!-- 分类-新增Modal -->
+                    <div class="ui tiny newType modal">
+                        <i class="close icon"></i>
+                        <div class="header">
+                            新增分类
+                        </div>
+                        <div class="content">
+                            <!-- 提示消息 -->
+                            <div class="ui message hidden" id="type-msg">
+                                <i class="close icon"></i>
+                                <div class="header">提示：</div>
+                                <p id="type-msg-content">恭喜，操作成功！</p>
+                            </div>
+                            <!-- 输入框 -->
+                            <div class="ui type form">
+                                <input type="hidden" name="type_id" th:value="'-1'">
+                                <div class="required field">
+                                    <div class="ui left fluid labeled input">
+                                        <label class="ui teal basic label">名称</label>
+                                        <input type="text" name="type_name" maxlength="10"  placeholder="分类名称">
+                                    </div>
+                                </div>
+                                <div class="ui error message"></div>
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <div class="ui black deny button">
+                                返回
+                            </div>
+                            <div class="ui green icon button" onclick="publishType(update=true)">
+                                提交
+                                <i class="checkmark icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 标签（无论发布还是草稿，都可不填） -->
+                <div class="field">
+                    <div class="ui left labeled action input">
+                        <label class="ui compact teal basic label">标签</label>
+                        <div class="ui fluid selection multiple search dropdown">
+                            <input type="hidden" name="tagsString" th:value="*{tagsString}" >
+                            <i class="dropdown icon"></i>
+                            <div class="default text">标签(不得多于3个标签)</div>
+                            <div class="menu" id="tag-menu">
+                                <div th:fragment="tagMenu" th:each="tag : ${tags}" class="item" data-value="1" th:data-value="${tag.tag_id}" th:text="${tag.tag_name}">java</div>
+                            </div>
+                        </div>
+                        <div class="ui icon green button" onclick="openTagModal()"><i class="plus icon"></i></div>
+                    </div>
+                    <!-- 标签-新增Modal -->
+                    <div class="ui tiny newTag modal">
+                        <i class="close icon"></i>
+                        <div class="header">
+                            新增标签
+                        </div>
+                        <div class="content">
+                            <!-- 提示消息 -->
+                            <div class="ui message hidden" id="tag-msg">
+                                <i class="close icon"></i>
+                                <div class="header">提示：</div>
+                                <p id="tag-msg-content">恭喜，操作成功！</p>
+                            </div>
+                            <!-- 输入框 -->
+                            <div class="ui tag form">
+                                <input type="hidden" name="tag_id" th:value="'-1'">
+                                <div class="required field">
+                                    <div class="ui left fluid labeled input">
+                                        <label class="ui teal basic label">名称</label>
+                                        <input type="text" name="tag_name" maxlength="10" placeholder="标签名称">
+                                    </div>
+                                </div>
+                                <div class="ui error message"></div>
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <div class="ui black deny button">
+                                返回
+                            </div>
+                            <div class="ui green icon button" onclick="publishTag(update=true)">
+                                提交
+                                <i class="checkmark icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 首图URL -->
+            <div class="required field">
+                <div class="ui left labeled input">
+                    <label class="ui teal basic label">首图</label>
+                    <input type="text" name="first_picture" placeholder="首图引用地址" th:value="*{first_picture}" id="first-picture">
+                    <div class="ui  buttons">
+                        <div class="ui icon blue button" onclick="previewPicture()"><i class="search icon"></i></div>
+                        <div class="ui icon button" onclick="closePreview()"><i class="minus icon"></i></div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- 首图预览 -->
+            <div class="field">
+                <div class="ui attached segment" id="preview-container" style="display: none">
+                    <div class="ui header">首图预览</div>
+                    <div class="ui red header" style="display: none" id="img-promt">图片资源不存在</div>
+                    <img src="" alt="" class="ui centered rounded image" id="first-picture-img">
+                </div>
+            </div>
+
+            <!--博客描述-->
+            <div class="required field">
+                <textarea name="description" th:text="*{description}" placeholder="博客描述..." maxlength="120" class="m-text-weight-small m-text-size-big"></textarea>
+            </div>
+
+            <!--推荐/声明/赞赏/评论-->
+            <div class="inline fields">
+                <div class="field">
+                    <div class="ui checkbox">
+                        <input type="checkbox" id="recommend" name="recommend" checked class="hidden" th:checked="*{recommend}">
+                        <label for="recommend">推荐</label>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui checkbox">
+                        <input type="checkbox" id="shareStatement" name="shareStatement" class="hidden" th:checked="*{shareStatement}">
+                        <label for="shareStatement">转载声明</label>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui checkbox">
+                        <input type="checkbox" id="appreciation" name="appreciation" class="hidden" th:checked="*{appreciation}">
+                        <label for="appreciation">赞赏</label>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui checkbox">
+                        <input type="checkbox" id="commentable" name="commentable" class="hidden" th:checked="*{commentable}">
+                        <label for="commentable">评论</label>
+                    </div>
+                </div>
+            </div>
+
+            <!--提示信息-->
+            <div class="ui error message"></div>
+
+            <!--返回/原文/保存草稿/发布 按钮-->
+            <div class="ui right aligned fluid container">
+                <button type="button" class="ui circular button" onclick="window.history.go(-1)" ><i class="arrow left icon"></i>返回</button>
+                <a href="#" target="_blank" th:href="@{/blog/{id}(id=${blog.blog_id})}" th:if="${blog} != null and ${blog.blog_id} != null" class="ui blue circular button"><i class="eye icon"></i>原文</a>
+                <button type="button" id="save-btn" class="ui teal circular button" onclick="save()"><i class="save outline icon"></i>草稿</button>
+                <button type="button" id="publish-btn" class="ui green circular button" onclick="publish()"><i class="globe icon"></i>发布</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+
+
+<!--  底部footer  -->
+<footer th:replace="_fragments :: footer" class="ui inverted vertical segment m-padded-tb-massive"></footer>
+
+
+<!--/*/<th:block th:replace="_fragments :: script">/*/-->
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.2/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+<!--/*/</th:block>/*/-->
+<script src="../../static/lib/editormd/editormd.min.js" th:src="@{/lib/editormd/editormd.min.js}"></script>
+<script src="../static/js/blogPublish.js" th:src="@{/js/blogPublish.js}"></script>
+<script src="../static/js/type_publish.js" th:src="@{/js/type_publish.js}"></script>
+<script src="../static/js/type_publish.js" th:src="@{/js/tag_publish.js}"></script>
+
+</body>
+</html>

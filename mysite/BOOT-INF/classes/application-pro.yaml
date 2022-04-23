@@ -1,0 +1,19 @@
+server:
+  port: 80  # 生产使用的端口号(80是域名解析时默认的端口号)
+
+spring:
+  datasource:
+    username: root
+    password: 123456  # 使用服务器上的数据库密码
+    url: jdbc:mysql://localhost:3306/blog?useUnicode=true&characterEncoding=utf-8&serverTimezone=UTC
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+# 配置日志
+logging:
+  level:
+    root: warn
+    com.zzw.mysite: info
+  file:
+    path: log/blog-pro.log
+
+

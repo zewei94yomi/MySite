@@ -1,0 +1,22 @@
+spring:
+  profiles:
+    active: pro
+  messages:
+    basename: i18n/messages
+
+# 所有评论的游客的统一头像
+comment.avatar: /images/avatar.png
+
+# 整合mybatis
+mybatis:
+  # 包别名，用于MyBatis查询结果的映射(ResultType)
+  type-aliases-package: com.zzw.mysite.po, com.zzw.mysite.vo
+  # mapper .xml映射的位置，注意.xml映射文件要放到resources下面
+  mapper-locations: classpath:mybatis/mapper/*.xml
+
+#分页pageHelper
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+

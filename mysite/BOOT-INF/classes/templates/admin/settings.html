@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="_fragments :: head(~{::title})">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>博客管理 - 个人设置</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <link rel="stylesheet" href="../../static/css/me.css">
+</head>
+<body>
+
+<!--  导航  -->
+<nav th:replace="admin/_admin_fragments :: menu(5)" class="ui inverted attached segment m-padded-tb-mini m-shadow-small">
+    <div class="ui container">
+        <div class="ui inverted secondary stackable menu">
+            <h2 class="ui teal header item">管理后台</h2>
+            <a href="#" class="m-item item m-mobile-hide"><i class="home icon"></i>首页</a>
+            <a href="#" class="m-item item m-mobile-hide"><i class="idea icon"></i>管理</a>
+            <a href="#" class="m-item item m-mobile-hide"><i class="tags icon"></i>发布</a>
+            <div class="right m-item m-mobile-hide menu">
+                <div class="ui dropdown item">
+                    <div class="text">
+                        <img src="https://unsplash.it/100/100?image=1005" alt="" class="ui avatar image">
+                        Zzw
+                    </div>
+                    <i class="dropdown icon"></i>
+                    <div class="menu">
+                        <a href="#" class="item">注销</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <a href="#" class="ui menu toggle black icon button m-right-top m-mobile-show">
+        <i class="sidebar icon"></i>
+    </a>
+</nav>
+
+<!--  中间  -->
+<div class="m-container-tiny m-padded-tb-large animated fadeIn">
+    <div class="ui container" >
+        <form class="ui settings form" th:action="@{/admin/settings/update}" method="post">
+            <h2 class="ui dividing header">个人信息设置</h2>
+            <input type="hidden" name="user_id" th:value="${info.user_id}">
+            <div class="required field">
+                <label>用户名</label>
+                <div class="ui icon input">
+                    <input type="text" name="username" placeholder="请输入你的用户名..." th:value="${info.username}">
+                    <i class="user icon"></i>
+                </div>
+            </div>
+            <div class="required field">
+                <label>昵称</label>
+                <div class="ui icon input">
+                    <input type="text" name="nickname" placeholder="请输入你的昵称..." th:value="${info.nickname}">
+                    <i class="address card icon"></i>
+                </div>
+            </div>
+            <div class="required field">
+                <label>头像URL</label>
+                <div class="ui field fluid">
+                    <div class="ui icon input">
+                        <input type="text" id="avatar" name="avatar" placeholder="请输入你的头像的URL..." th:value="${info.avatar}">
+                        <div class="ui icon blue button" onclick="previewAvatarPicture()"><i class="search icon"></i></div>
+                        <div class="ui icon button" onclick="closeAvatarPreview()"><i class="minus icon"></i></div>
+                    </div>
+
+                </div>
+            </div>
+            <!-- 头像预览 -->
+            <div class="field">
+                <div class="ui attached segment" id="avatar-preview-container" style="display: none">
+                    <div class="ui header">头像预览</div>
+                    <div class="ui red header" style="display: none" id="avatar-img-prompt">图片资源不存在</div>
+                    <img src="" alt="" class="ui centered circular image" id="avatar-img">
+                </div>
+            </div>
+            <div class="required field">
+                <label>Email</label>
+                <div class="ui icon input">
+                    <input type="text" name="email" placeholder="请输入你的邮箱..." th:value="${info.email}">
+                    <i class="mail icon"></i>
+                </div>
+            </div>
+            <div class="field">
+                <label>Github</label>
+                <div class="ui icon input">
+                    <input type="text" name="github" placeholder="请输入你的github主页或id..." th:value="${info.github}">
+                    <i class="github icon"></i>
+                </div>
+            </div>
+            <div class="field">
+                <label>Linkedin</label>
+                <div class="ui icon input">
+                    <input type="text" name="linkedin" placeholder="请输入你的Linkedin主页..." th:value="${info.linkedin}">
+                    <i class="linkedin icon"></i>
+                </div>
+            </div>
+            <div class="field">
+                <label>CSDN</label>
+                <div class="ui icon input">
+                    <input type="text" name="csdn" placeholder="请输入你的CSDN主页..." th:value="${info.csdn}">
+                    <i class="linkify icon"></i>
+                </div>
+            </div>
+            <div class="field">
+                <label>个人标签  <span>请以"/"分隔不同标签，e.g., "健身达人/宠物专家/游戏爱好者"</span></label>
+                <div class="ui icon input">
+                    <input type="text" name="myTagString" placeholder="请输入你的个人标签..." th:value="${info.myTagString}">
+                    <i class="tags icon"></i>
+                </div>
+            </div>
+            <div class="required field">
+                <label>关于我  <span>不多于255个字</span></label>
+                <div class="field">
+                    <textarea name="aboutMe" placeholder="请输入关于你的介绍..." maxlength="255" class="m-text-medium" th:text="${info.aboutMe}"></textarea>
+                </div>
+            </div>
+            <div class="required field">
+                <label>关于博客  <span>不多于255个字</span></label>
+                <div class="field">
+                    <textarea name="aboutBlog" placeholder="请输入关于博客的介绍..." maxlength="255" class="m-text-medium" th:text="${info.aboutBlog}"></textarea>
+                </div>
+            </div>
+            <div class="required field">
+                <label>关于页面图片URL</label>
+                <div class="ui labeled input">
+                    <input type="text" id="aboutMePicture" name="aboutMePicture" placeholder="请输入'关于'页面图片的URL..." th:value="${info.aboutMePicture}">
+                    <div class="ui icon blue button" onclick="previewBackgroundPicture()"><i class="search icon"></i></div>
+                    <div class="ui icon button" onclick="closeBackgroundPreview()"><i class="minus icon"></i></div>
+                </div>
+            </div>
+            <!-- 背景图预览 -->
+            <div class="field">
+                <div class="ui attached segment" id="background-preview-container" style="display:none;">
+                    <div class="ui header">背景预览</div>
+                    <div class="ui red header" style="display: none" id="background-img-prompt">图片资源不存在</div>
+                    <img src="" alt="" class="ui centered rounded image" id="background-img">
+                </div>
+            </div>
+            <div class="field">
+                <label>后台首图URL</label>
+                <div class="ui field fluid">
+                    <div class="ui icon input">
+                        <input type="text" id="adminIndexPicture" name="adminIndexPicture" placeholder="请输入后台首图的URL..." th:value="${info.adminIndexPicture}">
+                        <div class="ui icon blue button" onclick="previewAdminIndexPicture()"><i class="search icon"></i></div>
+                        <div class="ui icon button" onclick="closeAdminIndexPreview()"><i class="minus icon"></i></div>
+                    </div>
+                </div>
+            </div>
+            <!-- 后台首图预览 -->
+            <div class="field">
+                <div class="ui attached segment" id="adminIndex-preview-container" style="display: none">
+                    <div class="ui header">后台首图预览</div>
+                    <div class="ui red header" style="display: none" id="adminIndex-img-prompt">图片资源不存在</div>
+                    <img src="" alt="" class="ui centered image" id="adminIndex-img">
+                </div>
+            </div>
+            <div class="ui right aligned fluid container">
+                <button type="button" class="ui button" onclick="window.history.go(-1)" ><i class="arrow left icon"></i>返回</button>
+                <button type="submit" class="ui green button"><i class="save outline icon"></i>保存</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+
+
+<!--  底部footer  -->
+<footer th:replace="_fragments :: footer" class="ui inverted vertical segment m-padded-tb-massive">
+    <div class="ui center aligned container">
+        <div class="ui inverted divided stackable grid">
+            <div class="three wide column">
+                <div class="ui inverted link list">
+                    <div class="item">
+                        <img src="../../static/images/wechat.jpg" class="ui rounded image" style="width: 100px">
+                    </div>
+                </div>
+            </div>
+            <div class="three wide column">
+                <h4 class="ui inverted header m-text-thin m-text-spaced">最新博客</h4>
+                <div class="ui inverted link list">
+                    <a href="#" class="item">用户故事（User story）</a>
+                    <a href="#" class="item">用户故事（User story）</a>
+                    <a href="#" class="item">用户故事（User story）</a>
+                </div>
+            </div>
+            <div class="three wide column">
+                <h4 class="ui inverted header m-text-thin m-text-spaced">联系我</h4>
+                <div class="ui inverted link list">
+
+                    <a href="#" class="item">Email <i class="envelope outline icon"></i>ryanzhouzw@foxmail.com</a>
+                </div>
+            </div>
+            <div class="seven wide column">
+                <h4 class="ui inverted header m-text-thin m-text-spaced">Blog</h4>
+                <p class="m-text-thin m-text-spaced m-opacity-mini">这是我的个人博客，请多多关注和支持</p>
+            </div>
+        </div>
+
+        <!--分割线-->
+        <div class="ui inverted section divider"></div>
+
+        <p class="m-text-thin m-text-spaced m-opacity-mini">Copyright © 2021</p>
+    </div>
+</footer>
+
+<th:block th:replace="_fragments :: script">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.2/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+</th:block>
+<script src="../static/js/settings.js" th:src="@{/js/settings.js}"></script>
+
+</body>
+</html>
